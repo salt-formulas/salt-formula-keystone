@@ -330,6 +330,21 @@ Enable Federated keystone
           - wsgi
           - shib2
 
+Use a custom identity driver with custom options
+
+.. code-block:: yaml
+
+    keystone:
+      server:
+        identity:
+          driver = custom_driver
+        custom_sections:
+          custom_driver:
+            my_option = my_value
+            other_option = other_value
+
+
+
 Keystone client
 ---------------
 
