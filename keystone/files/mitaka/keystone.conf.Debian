@@ -951,7 +951,7 @@ domain_config_dir = /etc/keystone/domains
 {%- if server.get('backend', 'sql') == 'ldap' %}
 driver = ldap
 {%- else %}
-driver = sql
+driver = server.get('identity', {}).get('backend', 'sql')
 {%- endif %}
 
 # Toggle for identity caching. This has no effect unless global caching is
@@ -2193,3 +2193,11 @@ driver = memcache_pool
 
 [extra_headers]
 Distribution = Ubuntu
+
+{% for section in server.get('custom_sections', {}) %}
+[{{ section }}]
+{% for key, value in server['custom_sections'][section].items() %}
+{{ key }} = {{ value }}
+{% endfor %}
+
+{% endfor %}
