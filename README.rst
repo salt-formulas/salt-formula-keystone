@@ -338,11 +338,16 @@ Use a custom identity driver with custom options
       server:
         identity:
           driver = custom_driver
-        custom_sections:
-          custom_driver:
-            my_option: my_value
-            other_option: other_value
-
+        k2k:
+          auth_url: 'https://keystone.example.com/v2.0'
+          read_user: 'example_user'
+          read_pass: 'password'
+          read_tenant_id: 'admin'
+          identity_driver: 'sql'
+          id_prefix: 'k2k:'
+          domain: 'default'
+          caching: true
+          cache_time: 600
 
 
 Keystone client

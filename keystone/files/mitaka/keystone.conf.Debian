@@ -2194,10 +2194,51 @@ driver = memcache_pool
 [extra_headers]
 Distribution = Ubuntu
 
-{% for section in server.get('custom_sections', {}) %}
-[{{ section }}]
-{% for key, value in server['custom_sections'][section].items() %}
-{{ key }} = {{ value }}
-{% endfor %}
+{% if server.get('k2k') %}
+[k2k]
 
-{% endfor %}
+#
+# Specific driver configuration for identity backend k2k
+# (Authentication against other keystone backend as fallback)
+#
+
+# Authentication URL of keystone to authenticate against (v2.0 only)
+# (string value)
+#auth_url = https://keystone.example.com/v2.0
+auth_url = {{ server.k2k.get('auth_url')}}
+
+# User that is able to read users (string value)
+#read_user = admin
+read_user = {{ server.k2k.get('read_user')}}
+
+# Password for readonly user (string value)
+#read_pass = password
+read_pass = {{ server.k2k.get('read_pass')}}
+
+# Tenant id to be used to read (string value)
+#read_tenant_id = admin
+read_tenant_id = {{ server.k2k.get('read_tenant_id')}}
+
+# Keystone identity driver to use before k2k authentication (string value)
+#identity_driver = sql
+identity_driver = {{ server.k2k.get('identity_driver', 'sql')}}
+
+# UserId prefix to use for assignment mappings etc (string value)
+#id_prefix = k2k:
+id_prefix = {{ server.k2k.get('id_prefix', 'k2k:')}}
+
+# This value will be set in the User object after authentication (string value)
+#domain = default
+domain = {{ server.k2k.get('domain', 'default')}}
+
+# Toggle for k2k caching. This has no effect unless global caching is enabled.
+# (boolean value)
+#caching = true
+caching = {{ server.k2k.get('caching', 'true')}}
+
+# Time to cache identity data (in seconds). This has no effect unless global and 
+# identity caching are enabled. (integer value)
+#cache_time = 600
+cache_time = {{ server.k2k.get('cache_time', 600)}}
+
+{% endif %}
