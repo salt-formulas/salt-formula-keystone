@@ -336,8 +336,7 @@ Use a custom identity driver with custom options
 
     keystone:
       server:
-        identity:
-          driver = custom_driver
+        backend: k2k
         k2k:
           auth_url: 'https://keystone.example.com/v2.0'
           read_user: 'example_user'
