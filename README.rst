@@ -340,8 +340,8 @@ Use a custom identity driver with custom options
           driver = custom_driver
         custom_sections:
           custom_driver:
-            my_option = my_value
-            other_option = other_value
+            my_option: my_value
+            other_option: other_value
 
 
 
