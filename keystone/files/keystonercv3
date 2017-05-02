@@ -1,4 +1,4 @@
-{%- set server = pillar.keystone.server %}
+{%- from "keystone/map.jinja" import server with context %}
 export OS_IDENTITY_API_VERSION=3
 export OS_AUTH_URL=http://{{ server.bind.private_address }}:{{ server.bind.private_port }}/v3
 export OS_PROJECT_DOMAIN_NAME=default
