@@ -11,4 +11,11 @@ remote_agent:
       password: "{{ server.admin_password }}"
       identity_endpoint: "http://{{ server.bind.private_address|replace('0.0.0.0', '127.0.0.1') }}:{{ server.bind.private_port }}/v{% if server.get('api_version', 2)|int == 2 %}2.0{% else %}3{% endif %}"
       monitor_agents: "true"
+agent:
+  input:
+    http_response:
+      keystone-public-api:
+        address: "http://{{ server.bind.address|replace('0.0.0.0', '127.0.0.1') }}:{{ server.bind.public_port }}/"
+      keystone-admin-api:
+        address: "http://{{ server.bind.address|replace('0.0.0.0', '127.0.0.1') }}:{{ server.bind.private_port }}/"
 {%- endif %}
