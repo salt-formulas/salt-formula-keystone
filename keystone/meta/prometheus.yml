@@ -13,6 +13,29 @@ server:
         summary: "Endpoint check for '{{ $labels.service}}' is down"
         description: >-
             Endpoint check for '{{ $labels.service}}' is down for 2 minutes
-{% endraw %}
-{%- endif %}
+    KeystoneErrorLogsTooHigh:
+{%- endraw %}
+      {%- set log_threshold = prometheus_server.get('alert', {}).get('KeystoneErrorLogsTooHigh', {}).get('var', {}).get('threshold', 0.2 ) %}
+      if: >-
+        sum(rate(log_messages{service="keystone",level=~"error|emergency|fatal"}[5m])) without (level) > {{ log_threshold }}
+{%- raw %}
+      labels:
+        severity: warning
+        service: "{{ $labels.service }}"
+      annotations:
+        summary: 'Too many errors in {{ $labels.service }} logs'
+        description: 'The rate of errors in {{ $labels.service }} logs over the last 5 minutes is too high on node {{ $labels.host }} (current value={{ $value }}, threshold={%- endraw %}{{ log_threshold }}).'
+    KeystoneFailedAuthsTooHigh:
+      {%- set auth_threshold = prometheus_server.get('alert', {}).get('KeystoneFailedAuthsTooHigh', {}).get('var', {}).get('threshold', 50 ) %}
+      {%- set rate_threshold = prometheus_server.get('alert', {}).get('KeystoneFailedAuthsTooHigh', {}).get('var', {}).get('rate_threshold', 0.1 ) %}
+      if: >-
+        rate(authentications_total_failed[5m]) > rate(authentications_total_all[5m]) * {{ auth_threshold }} / 100 and rate(authentications_total_all[5m]) > {{ rate_threshold }}
+{%- raw %}
+      labels:
+        severity: warning
+        service: keystone
+      annotations:
+        summary: 'Too many failed authentications in Keystone'
+        description: 'The rate of failed authentications in Keystone over the last 5 minutes is too high (current value={{ $value }}, threshold={%- endraw %}{{ auth_threshold }}).'
 
+{%- endif %}
