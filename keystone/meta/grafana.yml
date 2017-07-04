@@ -8,6 +8,7 @@ dashboard:
     format: json
     template: keystone/files/grafana_dashboards/keystone_influxdb.json
   main:
+    datasource: influxdb
     row:
       ost-control-plane:
         title: OpenStack Control Plane
@@ -23,6 +24,7 @@ dashboard:
                 rawQuery: true
                 query: SELECT last(value) FROM cluster_status WHERE cluster_name = 'keystone' AND environment_label = '$environment' AND $timeFilter GROUP BY time($interval) fill(null)
   service_level:
+    datasource: influxdb
     row:
       keystone-service-level:
         title: Keystone Service Levels
