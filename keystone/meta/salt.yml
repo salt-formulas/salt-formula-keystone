@@ -48,6 +48,7 @@ minion:
       keystone.tenant: '{{ identity.admin.project }}'
       keystone.auth_url: '{{ protocol+'://'+identity.admin.host+':'+identity.admin.port|string+'/'+version }}'
       keystone.region_name: '{{ identity.admin.region_name }}'
+      keystone.use_keystoneauth: {{ identity.admin.get('use_keystoneauth', false) }}
 
         {%- endif %}
       {%- endif %}
