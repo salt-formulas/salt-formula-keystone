@@ -50,3 +50,13 @@
         'pkgs': [],
     },
 }, merge=pillar.keystone.get('control', {})) %}
+
+{% set monitoring = salt['grains.filter_by']({
+    'default': {
+        'error_log_rate': 0.2,
+        'failed_auths': {
+            'percentage': 50,
+            'all_auths_rate': 0.1,
+        },
+    },
+}, grain='os_family', merge=salt['pillar.get']('keystone:monitoring')) %}

@@ -1,4 +1,5 @@
 {%- if pillar.keystone.server is defined and pillar.keystone.server.get('enabled') %}
+{%- from "keystone/map.jinja" import monitoring with context %}
 {% raw %}
 server:
   alert:
@@ -15,7 +16,7 @@ server:
             Endpoint check for '{{ $labels.service}}' is down for 2 minutes
     KeystoneErrorLogsTooHigh:
 {%- endraw %}
-      {%- set log_threshold = prometheus_server.get('alert', {}).get('KeystoneErrorLogsTooHigh', {}).get('var', {}).get('threshold', 0.2 ) %}
+      {%- set log_threshold = monitoring.error_log_rate|float %}
       if: >-
         sum(rate(log_messages{service="keystone",level=~"error|emergency|fatal"}[5m])) without (level) > {{ log_threshold }}
 {%- raw %}
@@ -26,8 +27,8 @@ server:
         summary: 'Too many errors in {{ $labels.service }} logs'
         description: 'The rate of errors in {{ $labels.service }} logs over the last 5 minutes is too high on node {{ $labels.host }} (current value={{ $value }}, threshold={%- endraw %}{{ log_threshold }}).'
     KeystoneFailedAuthsTooHigh:
-      {%- set auth_threshold = prometheus_server.get('alert', {}).get('KeystoneFailedAuthsTooHigh', {}).get('var', {}).get('threshold', 50 ) %}
-      {%- set rate_threshold = prometheus_server.get('alert', {}).get('KeystoneFailedAuthsTooHigh', {}).get('var', {}).get('rate_threshold', 0.1 ) %}
+      {%- set auth_threshold = monitoring.failed_auths.percentage %}
+      {%- set rate_threshold = monitoring.failed_auths.all_auths_rate|float %}
       if: >-
         rate(authentications_total_failed[5m]) > rate(authentications_total_all[5m]) * {{ auth_threshold }} / 100 and rate(authentications_total_all[5m]) > {{ rate_threshold }}
 {%- raw %}
