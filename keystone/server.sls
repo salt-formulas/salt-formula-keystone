@@ -157,6 +157,7 @@ keystone_domain_{{ domain_name }}:
   cmd.run:
     - name: source /root/keystonercv3 && openstack domain create --description "{{ domain.description }}" {{ domain_name }}
     - unless: source /root/keystonercv3 && openstack domain list | grep " {{ domain_name }}"
+    - shell: /bin/bash
     - require:
       - file: /root/keystonercv3
       - service: {{ keystone_service }}
