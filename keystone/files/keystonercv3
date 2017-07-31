@@ -9,4 +9,5 @@ export OS_USERNAME={{ server.admin_name }}
 export OS_PASSWORD={{ server.admin_password }}
 export OS_REGION_NAME={{ server.region }}
 export OS_INTERFACE=internal
+export OS_ENDPOINT_TYPE="internal"
 export OS_CACERT="{{ server.cacert }}"
