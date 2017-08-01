@@ -1577,14 +1577,31 @@ driver=messagingv2
 # Allowed values: round-robin, shuffle
 #kombu_failover_strategy = round-robin
 
+{%- set rabbit_port = server.message_queue.get('port', 5671 if server.message_queue.get('ssl',{}).get('enabled', False)  else 5672) %}
 {%- if server.message_queue.members is defined %}
 rabbit_hosts = {% for member in server.message_queue.members -%}
-                   {{ member.host }}:{{ member.get('port', 5672) }}
+                   {{ member.host }}:{{ member.get('port', rabbit_port) }}
                    {%- if not loop.last -%},{%- endif -%}
                {%- endfor -%}
 {%- else %}
 rabbit_host = {{ server.message_queue.host }}
-rabbit_port = {{ server.message_queue.port }}
+rabbit_port = {{ rabbit_port }}
+{%- endif %}
+
+{%- if server.message_queue.get('ssl',{}).get('enabled', False) %}
+rabbit_use_ssl=true
+
+{%- if server.message_queue.ssl.version is defined %}
+kombu_ssl_version = {{ server.message_queue.ssl.version }}
+{%- elif salt['grains.get']('pythonversion') > [2,7,8] %}
+kombu_ssl_version = TLSv1_2
+{%- endif %}
+
+{%- if server.message_queue.ssl.cacert_file is defined %}
+kombu_ssl_ca_certs = {{ server.message_queue.ssl.cacert_file }}
+{%- else %}
+kombu_ssl_ca_certs={{ system_cacerts_file }}
+{%- endif %}
 {%- endif %}
 
 # RabbitMQ HA cluster host:port pairs. (list value)

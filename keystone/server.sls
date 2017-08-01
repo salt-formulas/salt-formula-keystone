@@ -227,6 +227,9 @@ keystone_service:
   - onlyif: /bin/false
   {%- endif %}
   - watch:
+    {%- if server.notification and server.message_queue.get('ssl',{}).get('enabled', False) %}
+    - file: rabbitmq_ca
+    {%- endif %}
     - file: /etc/keystone/keystone.conf
 {%- endif %}
 
@@ -445,6 +448,21 @@ mysql_ca:
    - name: {{ server.database.ssl.get('cacert_file', system_cacerts_file) }}
    - require_in:
      - file: /etc/keystone/keystone.conf
+{% endif %}
+{% endif %}
+
+
+{%- if server.notification and server.message_queue.get('ssl',{}).get('enabled', False) %}
+rabbitmq_ca:
+{%- if server.message_queue.ssl.cacert is defined %}
+  file.managed:
+    - name: {{ server.message_queue.ssl.cacert_file }}
+    - contents_pillar: keystone:server:message_queue:ssl:cacert
+    - mode: 0444
+    - makedirs: true
+{%- else %}
+  file.exists:
+   - name: {{ server.message_queue.ssl.get('cacert_file', system_cacerts_file) }}
 {%- endif %}
 {%- endif %}
 

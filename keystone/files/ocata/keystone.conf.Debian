@@ -425,14 +425,15 @@ log_dir = /var/log/keystone
 # A URL representing the messaging driver to use and its full configuration.
 # (string value)
 #transport_url = rabbit://nova:3qVSI7a1m8AdaDQ7BpB0PJu4@192.168.0.4:5673/
+{%- set rabbit_port = server.message_queue.get('port', 5671 if server.message_queue.get('ssl',{}).get('enabled', False)  else 5672) %}
 {%- if server.message_queue.members is defined %}
 transport_url = rabbit://{% for member in server.message_queue.members -%}
-                             {{ server.message_queue.user }}:{{ server.message_queue.password }}@{{ member.host }}:{{ member.get('port', 5672) }}
+                             {{ server.message_queue.user }}:{{ server.message_queue.password }}@{{ member.host }}:{{ member.get('port', rabbit_port) }}
                              {%- if not loop.last -%},{%- endif -%}
                          {%- endfor -%}
                              /{{ server.message_queue.virtual_host }}
 {%- else %}
-transport_url = rabbit://{{ server.message_queue.user }}:{{ server.message_queue.password }}@{{ server.message_queue.host }}:{{ server.message_queue.port }}/{{ server.message_queue.virtual_host }}
+transport_url = rabbit://{{ server.message_queue.user }}:{{ server.message_queue.password }}@{{ server.message_queue.host }}:{{ rabbit_port }}/{{ server.message_queue.virtual_host }}
 {%- endif %}
 
 # DEPRECATED: The messaging driver to use, defaults to rabbit. Other drivers
@@ -441,7 +442,6 @@ transport_url = rabbit://{{ server.message_queue.user }}:{{ server.message_queue
 # Its value may be silently ignored in the future.
 # Reason: Replaced by [DEFAULT]/transport_url
 #rpc_backend = rabbit
-rpc_backend = rabbit
 {%- endif %}
 # The default exchange under which topics are scoped. May be overridden by an
 # exchange name specified in the transport_url option. (string value)
@@ -1961,6 +1961,27 @@ driver=messagingv2
 #
 # From oslo.messaging
 #
+
+
+{%- if server.notification %}
+
+{%- if server.message_queue.get('ssl',{}).get('enabled', False) %}
+rabbit_use_ssl=true
+
+{%- if server.message_queue.ssl.version is defined %}
+kombu_ssl_version = {{ server.message_queue.ssl.version }}
+{%- elif salt['grains.get']('pythonversion') > [2,7,8] %}
+kombu_ssl_version = TLSv1_2
+{%- endif %}
+
+{%- if server.message_queue.ssl.cacert_file is defined %}
+kombu_ssl_ca_certs = {{ server.message_queue.ssl.cacert_file }}
+{%- else %}
+kombu_ssl_ca_certs={{ system_cacerts_file }}
+{%- endif %}
+{%- endif %}
+
+{%- endif %}
 
 # Use durable queues in AMQP. (boolean value)
 # Deprecated group/name - [DEFAULT]/amqp_durable_queues
