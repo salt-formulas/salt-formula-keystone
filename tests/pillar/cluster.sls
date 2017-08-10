@@ -44,3 +44,8 @@ keystone:
         port: 11211
       - host: 127.0.0.1
         port: 11211
+    domain:
+      test:
+        description: "Test domain"
+        identity:
+          list_limit: 20
