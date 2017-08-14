@@ -1151,7 +1151,7 @@ servers = ['{{ server.cache.host }}:{{ server.cache.port }}']
 # The maximum body size for each  request, in bytes. (integer value)
 # Deprecated group/name - [DEFAULT]/osapi_max_request_body_size
 # Deprecated group/name - [DEFAULT]/max_request_body_size
-#max_request_body_size = 114688
+max_request_body_size= {{ server.max_request_body_size }}
 
 
 [oslo_policy]
@@ -1458,6 +1458,7 @@ driver=keystone.token.persistence.backends.memcache_pool.Token
 # middleware must be configured with the hash_algorithms, otherwise token
 # revocation will not be processed correctly. (string value)
 #hash_algorithm = md5
+hash_algorithm = {{ server.hash_algorithm }}
 
 
 [trust]

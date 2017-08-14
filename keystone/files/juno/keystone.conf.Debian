@@ -79,7 +79,7 @@ admin_bind_host={% if server.bind.address is defined %}{{ server.bind.address }}
 # Enforced by optional sizelimit middleware
 # (keystone.middleware:RequestBodySizeLimiter). (integer
 # value)
-#max_request_body_size=114688
+max_request_body_size= {{ server.max_request_body_size }}
 
 # Limit the sizes of user & project ID/names. (integer value)
 #max_param_size=64
@@ -1625,6 +1625,7 @@ caching=False
 # configured with the hash_algorithms, otherwise token
 # revocation will not be processed correctly. (string value)
 #hash_algorithm=md5
+hash_algorithm = {{ server.hash_algorithm }}
 
 
 [trust]

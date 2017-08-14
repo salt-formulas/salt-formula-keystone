@@ -82,7 +82,27 @@ keystone_group:
 /etc/keystone/keystone-paste.ini:
   file.managed:
   - source: salt://keystone/files/{{ server.version }}/keystone-paste.ini.{{ grains.os_family }}
+  - user: keystone
+  - group: keystone
   - template: jinja
+  - require:
+    - pkg: keystone_packages
+  - watch_in:
+    - service: {{ keystone_service }}
+
+/etc/keystone/policy.json:
+  file.managed:
+  - user: keystone
+  - group: keystone
+  - require:
+    - pkg: keystone_packages
+  - watch_in:
+    - service: {{ keystone_service }}
+
+/etc/keystone/logging.conf:
+  file.managed:
+  - user: keystone
+  - group: keystone
   - require:
     - pkg: keystone_packages
   - watch_in:

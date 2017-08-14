@@ -2225,7 +2225,7 @@ heartbeat_rate = 2
 # The maximum body size for each  request, in bytes. (integer value)
 # Deprecated group/name - [DEFAULT]/osapi_max_request_body_size
 # Deprecated group/name - [DEFAULT]/max_request_body_size
-#max_request_body_size = 114688
+max_request_body_size= {{ server.max_request_body_size }}
 
 # DEPRECATED: The HTTP Header that will be used to determine what the original
 # request protocol scheme was, even if it was hidden by a SSL termination
@@ -2844,6 +2844,7 @@ revoke_by_id = False
 # Reason: PKI token support has been deprecated in the M release and will be
 # removed in the O release. Fernet or UUID tokens are recommended.
 #hash_algorithm = md5
+hash_algorithm = {{ server.hash_algorithm }}
 
 # This controls whether roles should be included with tokens that are not
 # directly assigned to the token's scope, but are instead linked implicitly to
