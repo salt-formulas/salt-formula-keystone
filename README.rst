@@ -202,16 +202,17 @@ Keystone domain with LDAP backend, using SQL for role/project assignment
     keystone:
       server:
         domain:
-          description: "Testing domain"
-          backend: ldap
-          assignment:
-            backend: sql
-          ldap:
-            url: "ldaps://idm.domain.com"
-            suffix: "dc=cloud,dc=domain,dc=com"
-            # Will bind as uid=keystone,cn=users,cn=accounts,dc=cloud,dc=domain,dc=com
-            uid: keystone
-            password: password
+          external:
+            description: "Testing domain"
+            backend: ldap
+            assignment:
+              backend: sql
+            ldap:
+              url: "ldaps://idm.domain.com"
+              suffix: "dc=cloud,dc=domain,dc=com"
+              # Will bind as uid=keystone,cn=users,cn=accounts,dc=cloud,dc=domain,dc=com
+              uid: keystone
+              password: password
 
 Using LDAP backend for default domain
 

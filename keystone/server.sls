@@ -5,6 +5,14 @@ keystone_packages:
   pkg.installed:
   - names: {{ server.pkgs }}
 
+{%- if server.get('backend') == 'ldap' or server.get('domain',{}).itervalues() | selectattr('ldap') | list %}
+keystone_ldap_packages:
+  pkg.installed:
+  - names:
+    - python-ldap
+    - python-ldappool
+{% endif %}
+
 {%- if server.service_name in ['apache2', 'httpd'] %}
 {%- set keystone_service = 'apache_service' %}
 
