@@ -1,4 +1,4 @@
-{%- from "keystone/map.jinja" import server with context %}
+{%- from "keystone/map.jinja" import server, system_cacerts_file with context %}
 {%- if server.enabled %}
 
 keystone_packages:
@@ -418,5 +418,23 @@ keystone_user_{{ user_name }}:
 
 {%- endfor %}
 {%- endif %} {# end noservices #}
+
+{%- if server.database.get('ssl',{}).get('enabled',False)  %}
+mysql_ca:
+{%- if server.database.ssl.cacert is defined %}
+  file.managed:
+    - name: {{ server.database.ssl.cacert_file }}
+    - contents_pillar: keystone:server:database:ssl:cacert
+    - mode: 0444
+    - makedirs: true
+    - require_in:
+      - file: /etc/keystone/keystone.conf
+{%- else %}
+  file.exists:
+   - name: {{ server.database.ssl.get('cacert_file', system_cacerts_file) }}
+   - require_in:
+     - file: /etc/keystone/keystone.conf
+{%- endif %}
+{%- endif %}
 
 {%- endif %}

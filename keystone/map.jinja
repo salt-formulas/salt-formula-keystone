@@ -1,3 +1,7 @@
+{%- set system_cacerts_file = salt['grains.filter_by']({
+    'Debian': '/etc/ssl/certs/ca-certificates.crt',
+    'RedHat': '/etc/pki/tls/certs/ca-bundle.crt'
+})%}
 
 {% set server = salt['grains.filter_by']({
     'Debian': {
