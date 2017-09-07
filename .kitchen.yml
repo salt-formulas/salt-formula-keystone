@@ -74,6 +74,13 @@ suites:
       pillars-from-files:
         keystone.sls: tests/pillar/single.sls
 
+  - name: single_domain
+    provisioner:
+      grains:
+        noservices: True
+      pillars-from-files:
+        keystone.sls: tests/pillar/single_domain.sls
+
   - name: single_fernet
     provisioner:
       pillars-from-files:

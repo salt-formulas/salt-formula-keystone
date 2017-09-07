@@ -5,7 +5,18 @@ keystone_packages:
   pkg.installed:
   - names: {{ server.pkgs }}
 
-{%- if server.get('backend') == 'ldap' or server.get('domain',{}).itervalues() | selectattr('ldap') | list %}
+{%- set ldap = {'enabled': False} %}
+{%- if server.get('backend') == 'ldap' %}
+  {%- do ldap.update({'enabled': True}) %}
+{%- else %}
+  {%- for domain in server.get('domain', {}).itervalues() %}
+    {%- if domain.get('ldap') %}
+      {%- do ldap.update({'enabled': True}) %}
+    {%- endif %}
+  {%- endfor %}
+{%- endif %}
+
+{%- if ldap.enabled %}
 keystone_ldap_packages:
   pkg.installed:
   - names:
@@ -184,7 +195,7 @@ keystone_domain_{{ domain_name }}_cacert:
 keystone_domain_{{ domain_name }}:
   cmd.run:
     - name: source /root/keystonercv3 && openstack domain create --description "{{ domain.description }}" {{ domain_name }}
-    - unless: source /root/keystonercv3 && openstack domain list | grep " {{ domain_name }}"
+    - unless: {% if grains.get('noservices') %}/bin/true{% else %}source /root/keystonercv3 && openstack domain list | grep " {{ domain_name }}"{% endif %}
     - shell: /bin/bash
     - require:
       - file: /root/keystonercv3
