@@ -2809,7 +2809,9 @@ expiration = {{ server.tokens.expiration }}
 # later validating those signatures. (string value)
 #provider = uuid
 {% if server.tokens.engine == 'fernet' %}
-provider = keystone.token.providers.fernet.Provider
+provider = fernet
+{% else %}
+provider = uuid
 {% endif %}
 
 # Entry point for the token persistence backend driver in the
@@ -2821,7 +2823,9 @@ provider = keystone.token.providers.fernet.Provider
 # you're using the `fernet` `[token] provider`, this backend will not be
 # utilized to persist tokens at all. (string value)
 #driver = sql
-driver = keystone.token.persistence.backends.memcache_pool.Token
+{% if server.tokens.engine == 'database' %}
+driver = memcache_pool
+{% endif %}
 
 # Toggle for caching token creation and validation data. This has no effect
 # unless global caching is enabled. (boolean value)
