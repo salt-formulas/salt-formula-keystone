@@ -664,6 +664,18 @@ Configuration of policy.json file
         policy:
           admin_or_token_subject: 'rule:admin_required or rule:token_subject'
 
+Setting up default admin project name and domain
+
+.. code-block:: yaml
+
+
+    keystone:
+      server:
+        ....
+        admin_project:
+          name: "admin"
+          domain: "default"
+
 Usage
 =====
 

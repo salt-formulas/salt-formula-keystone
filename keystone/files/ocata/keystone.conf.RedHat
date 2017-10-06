@@ -2560,6 +2560,9 @@ driver = keystone.policy.backends.sql.Policy
 # Name of the domain that owns the `admin_project_name`. If left unset, then
 # there is no admin project. `[resource] admin_project_name` must also be set
 # to use this option. (string value)
+{%- if server.admin_project is defined %}
+admin_project_domain_name = {{ server.admin_project.domain }}
+{%- endif %}
 #admin_project_domain_name = <None>
 
 # This is a special project which represents cloud-level administrator
@@ -2570,6 +2573,9 @@ driver = keystone.policy.backends.sql.Policy
 # means of cross-project role assignments. `[resource]
 # admin_project_domain_name` must also be set to use this option. (string
 # value)
+{%- if server.admin_project is defined %}
+admin_project_name = {{ server.admin_project.name }}
+{%- endif %}
 #admin_project_name = <None>
 
 # This controls whether the names of projects are restricted from containing
