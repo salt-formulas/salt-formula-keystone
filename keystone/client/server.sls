@@ -28,7 +28,7 @@
 {%- if server.roles is defined %}
 
 keystone_{{ server_name }}_roles:
-  keystone.role_present:
+  keystoneng.role_present:
   - names: {{ server.roles }}
   {%- if server.admin.token is defined %}
   - connection_token: {{ connection_args.token }}
@@ -45,7 +45,7 @@ keystone_{{ server_name }}_roles:
 {% for service_name, service in server.get('service', {}).iteritems() %}
 
 keystone_{{ server_name }}_service_{{ service_name }}:
-  keystone.service_present:
+  keystoneng.service_present:
   - name: {{ service_name }}
   - service_type: {{ service.type }}
   - description: {{ service.description }}
@@ -62,14 +62,14 @@ keystone_{{ server_name }}_service_{{ service_name }}:
 {%- for endpoint in service.get('endpoints', ()) %}
 
 keystone_{{ server_name }}_service_{{ service_name }}_endpoint_{{ endpoint.region }}:
-  keystone.endpoint_present:
+  keystoneng.endpoint_present:
   - name: {{ service_name }}
   - publicurl: '{{ endpoint.get('public_protocol', 'http') }}://{{ endpoint.public_address }}{% if not (endpoint.get('public_protocol', 'http') == 'https' and endpoint.public_port|int == 443) %}:{{ endpoint.public_port }}{% endif %}{{ endpoint.public_path }}'
   - internalurl: '{{ endpoint.get('internal_protocol', 'http') }}://{{ endpoint.internal_address }}{% if not (endpoint.get('internal_protocol', 'http') == 'https' and endpoint.internal_port|int == 443) %}:{{ endpoint.internal_port }}{% endif %}{{ endpoint.internal_path }}'
   - adminurl: '{{ endpoint.get('admin_protocol', 'http') }}://{{ endpoint.admin_address }}{% if not (endpoint.get('admin_protocol', 'http') == 'https' and endpoint.admin_port|int == 443) %}:{{ endpoint.admin_port }}{% endif %}{{ endpoint.admin_path }}'
   - region: {{ endpoint.region }}
   - require:
-    - keystone: keystone_{{ server_name }}_service_{{ service_name }}
+    - keystoneng: keystone_{{ server_name }}_service_{{ service_name }}
   {%- if server.admin.token is defined %}
   - connection_token: {{ connection_args.token }}
   - connection_endpoint: {{ connection_args.endpoint }}
@@ -87,7 +87,7 @@ keystone_{{ server_name }}_service_{{ service_name }}_endpoint_{{ endpoint.regio
 {%- for tenant_name, tenant in server.get('project', {}).iteritems() %}
 
 keystone_{{ server_name }}_tenant_{{ tenant_name }}:
-  keystone.tenant_present:
+  keystoneng.tenant_present:
   - name: {{ tenant_name }}
   {%- if tenant.description is defined %}
   - description: {{ tenant.description }}
@@ -112,14 +112,14 @@ keystone_{{ server_name }}_tenant_{{ tenant_name }}_quota:
     - {{ quota_name }}: {{ quota_value }}
     {%- endfor %}
     - require:
-      - keystone: keystone_{{ server_name }}_tenant_{{ tenant_name }}
+      - keystoneng: keystone_{{ server_name }}_tenant_{{ tenant_name }}
 
 {%- endif %}
 
 {%- for user_name, user in tenant.get('user', {}).iteritems() %}
 
 keystone_{{ server_name }}_tenant_{{ tenant_name }}_user_{{ user_name }}:
-  keystone.user_present:
+  keystoneng.user_present:
   - name: {{ user_name }}
   - password: {{ user.password }}
   {%- if user.email is defined %}
@@ -136,8 +136,8 @@ keystone_{{ server_name }}_tenant_{{ tenant_name }}_user_{{ user_name }}:
         - Member
         {%- endif %}
   - require:
-    - keystone: keystone_{{ server_name }}_tenant_{{ tenant_name }}
-    - keystone: keystone_{{ server_name }}_roles
+    - keystoneng: keystone_{{ server_name }}_tenant_{{ tenant_name }}
+    - keystoneng: keystone_{{ server_name }}_roles
   {%- if server.admin.token is defined %}
   - connection_token: {{ connection_args.token }}
   - connection_endpoint: {{ connection_args.endpoint }}

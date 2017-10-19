@@ -4,7 +4,7 @@
 {%- if client.tenant is defined %}
 
 keystone_client_roles:
-  keystone.role_present:
+  keystoneng.role_present:
   - names: {{ client.roles }}
   - connection_user: {{ client.server.user }}
   - connection_password: {{ client.server.password }}
@@ -14,19 +14,19 @@ keystone_client_roles:
 {%- for tenant_name, tenant in client.get('tenant', {}).iteritems() %}
 
 keystone_tenant_{{ tenant_name }}:
-  keystone.tenant_present:
+  keystoneng.tenant_present:
   - name: {{ tenant_name }}
   - connection_user: {{ client.server.user }}
   - connection_password: {{ client.server.password }}
   - connection_tenant: {{ client.server.tenant }}
   - connection_auth_url: 'http://{{ client.server.host }}:{{ client.server.public_port }}/v2.0/'
   - require:
-    - keystone: keystone_client_roles
+    - keystoneng: keystone_client_roles
 
 {%- for user_name, user in tenant.get('user', {}).iteritems() %}
 
 keystone_{{ tenant_name }}_user_{{ user_name }}:
-  keystone.user_present:
+  keystoneng.user_present:
   - name: {{ user_name }}
   - password: {{ user.password }}
   - email: {{ user.get('email', 'root@localhost') }}
@@ -45,7 +45,7 @@ keystone_{{ tenant_name }}_user_{{ user_name }}:
   - connection_tenant: {{ client.server.tenant }}
   - connection_auth_url: 'http://{{ client.server.host }}:{{ client.server.public_port }}/v2.0/'
   - require:
-    - keystone: keystone_tenant_{{ tenant_name }}
+    - keystoneng: keystone_tenant_{{ tenant_name }}
 
 {%- endfor %}
 
