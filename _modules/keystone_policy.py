@@ -2,6 +2,8 @@ import io
 import json
 import logging
 
+from collections import OrderedDict
+
 import yaml
 
 LOG = logging.getLogger(__name__)
@@ -15,7 +17,7 @@ def rule_list(path, **kwargs):
     try:
         with io.open(path, 'r') as file_handle:
             rules = yaml.safe_load(file_handle) or {}
-        rules = {str(k): str(v) for (k, v) in rules.items()}
+        rules = OrderedDict(str(k): str(v) for (k, v) in rules.items())
     except Exception as e:
         msg = "Unable to load policy file %s: %s" % (path, repr(e))
         LOG.debug(msg)
