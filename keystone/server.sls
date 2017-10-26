@@ -289,7 +289,7 @@ keystone_fernet_setup:
 
 {% endif %}
 
-{%- if server.version in ['newton', 'ocata'] %}
+{%- if server.version in ['newton', 'ocata', 'pike'] %}
 keystone_credential_keys:
   file.directory:
   - name: {{ server.credential.location }}
