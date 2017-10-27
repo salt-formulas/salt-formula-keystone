@@ -2,11 +2,55 @@ import io
 import json
 import logging
 
-from collections import OrderedDict
+LOG = logging.getLogger(__name__)
 
 import yaml
+import yaml.constructor
 
-LOG = logging.getLogger(__name__)
+try:
+    # included in standard lib from Python 2.7
+    from collections import OrderedDict
+except ImportError:
+    # try importing the backported drop-in replacement
+    # it's available on PyPI
+    from ordereddict import OrderedDict
+
+# https://stackoverflow.com/questions/5121931/in-python-how-can-you-load-yaml-mappings-as-ordereddicts
+class OrderedDictYAMLLoader(yaml.Loader):
+    """
+    A YAML loader that loads mappings into ordered dictionaries.
+    """
+
+    def __init__(self, *args, **kwargs):
+        yaml.Loader.__init__(self, *args, **kwargs)
+
+        self.add_constructor(u'tag:yaml.org,2002:map', type(self).construct_yaml_map)
+        self.add_constructor(u'tag:yaml.org,2002:omap', type(self).construct_yaml_map)
+
+    def construct_yaml_map(self, node):
+        data = OrderedDict()
+        yield data
+        value = self.construct_mapping(node)
+        data.update(value)
+
+    def construct_mapping(self, node, deep=False):
+        if isinstance(node, yaml.MappingNode):
+            self.flatten_mapping(node)
+        else:
+            raise yaml.constructor.ConstructorError(None, None,
+                'expected a mapping node, but found %s' % node.id, node.start_mark)
+
+        mapping = OrderedDict()
+        for key_node, value_node in node.value:
+            key = self.construct_object(key_node, deep=deep)
+            try:
+                hash(key)
+            except TypeError, exc:
+                raise yaml.constructor.ConstructorError('while constructing a mapping',
+                    node.start_mark, 'found unacceptable key (%s)' % exc, key_node.start_mark)
+            value = self.construct_object(value_node, deep=deep)
+            mapping[key] = value
+        return mapping
 
 
 def __virtual__():
@@ -16,8 +60,7 @@ def __virtual__():
 def rule_list(path, **kwargs):
     try:
         with io.open(path, 'r') as file_handle:
-            rules = yaml.safe_load(file_handle) or {}
-        rules = OrderedDict(str(k): str(v) for (k, v) in rules.items())
+            rules = yaml.load(file_handle, OrderedDictYAMLLoader) or OrderedDict()
     except Exception as e:
         msg = "Unable to load policy file %s: %s" % (path, repr(e))
         LOG.debug(msg)
