@@ -337,6 +337,8 @@ keystone_roles:
   - require:
     - keystone: keystone_service_tenant
 
+{%- if not server.get('ldap', {}).get('read_only', False) %}
+
 keystone_admin_user:
   keystone.user_present:
   - name: {{ server.admin_name }}
@@ -351,6 +353,8 @@ keystone_admin_user:
   - require:
     - keystone: keystone_admin_tenant
     - keystone: keystone_roles
+
+{%- endif %}
 
 {%- endif %}
 
