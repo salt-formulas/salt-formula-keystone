@@ -3065,3 +3065,12 @@ revoke_by_id = False
 #driver = sql
 [extra_headers]
 Distribution = Ubuntu
+
+{% if server.extra_config is defined %}
+{%- for section, params in server.extra_config.iteritems() %}
+[{{ section }}]
+{%- for param, value in params.iteritems() %}
+{{ param }} = {{ value }}
+{%- endfor %}
+{%- endfor %}
+{%- endif %}
