@@ -6,5 +6,8 @@ export OS_AUTH_URL=http://{{ server.bind.private_address }}:{{ server.bind.priva
 export OS_REGION_NAME={{ server.region }}
 export OS_SERVICE_TOKEN={{ server.service_token }}
 export OS_SERVICE_ENDPOINT="http://{{ server.bind.private_address }}:{{ server.bind.private_port }}/v2.0/"
-export OS_ENDPOINT_TYPE="internal"
+{%- if server.interface is defined %}
+export OS_INTERFACE={{ server.interface }}
+{%- endif %}
+export OS_ENDPOINT_TYPE={{ server.get('interface', 'internal') }}
 export OS_CACERT="{{ server.cacert }}"
