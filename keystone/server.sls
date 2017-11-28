@@ -228,7 +228,7 @@ keystone_service:
   {%- endif %}
   - watch:
     {%- if server.notification and server.message_queue.get('ssl',{}).get('enabled', False) %}
-    - file: rabbitmq_ca
+    - file: rabbitmq_ca_keystone_server
     {%- endif %}
     - file: /etc/keystone/keystone.conf
 {%- endif %}
@@ -438,7 +438,7 @@ keystone_user_{{ user_name }}:
 {%- endif %} {# end noservices #}
 
 {%- if server.database.get('ssl',{}).get('enabled',False)  %}
-mysql_ca:
+mysql_ca_keystone_server:
 {%- if server.database.ssl.cacert is defined %}
   file.managed:
     - name: {{ server.database.ssl.cacert_file }}
@@ -457,7 +457,7 @@ mysql_ca:
 
 
 {%- if server.notification and server.message_queue.get('ssl',{}).get('enabled', False) %}
-rabbitmq_ca:
+rabbitmq_ca_keystone_server:
 {%- if server.message_queue.ssl.cacert is defined %}
   file.managed:
     - name: {{ server.message_queue.ssl.cacert_file }}
