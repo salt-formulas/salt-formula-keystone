@@ -49,3 +49,6 @@ keystone:
         description: "Test domain"
         identity:
           list_limit: 20
+    extra_config:
+      federation:
+        cache_group_membership_in_db: true

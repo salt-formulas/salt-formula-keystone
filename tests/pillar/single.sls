@@ -28,6 +28,9 @@ keystone:
       location: /etc/keystone/fernet-keys/
     notification: false
     notification_format: cadf
+    extra_config:
+      federation:
+        cache_group_membership_in_db: true
     #message_queue:
       #engine: rabbitmq
       #host: 127.0.0.1
