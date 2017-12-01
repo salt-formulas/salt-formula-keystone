@@ -669,7 +669,7 @@ allow_credentials = {{ server.cors.allow_credentials }}
 # Headers. (list value)
 #expose_headers = X-Auth-Token,X-Openstack-Request-Id,X-Subject-Token
 {% if server.cors.expose_headers is defined %}
-allowed_origin = {{ server.cors.expose_headers }}
+expose_headers = {{ server.cors.expose_headers }}
 {% endif %}
 
 # Maximum cache age of CORS preflight requests. (integer value)
