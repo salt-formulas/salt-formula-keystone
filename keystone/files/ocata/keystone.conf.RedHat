@@ -751,7 +751,7 @@ driver = sql
 # Deprecated group/name - [DATABASE]/sql_connection
 # Deprecated group/name - [sql]/connection
 #connection = <None>
-connection={{ server.database.engine }}+pymysql://{{ server.database.user }}:{{ server.database.password }}@{{ server.database.host }}/{{ server.database.name }}
+connection={{ server.database.engine }}{%- if server.database.engine == 'mysql' and '+' not in server.database.engine -%}+pymysql{%- endif -%}://{{ server.database.user }}:{{ server.database.password }}@{{ server.database.host }}/{{ server.database.name }}
 
 # The SQLAlchemy connection string to use to connect to the slave database.
 # (string value)
