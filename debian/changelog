@@ -1,0 +1,30 @@
+salt-formula-keystone (2016.12.1-2) unstable; urgency=medium
+  * Update CI
+  * Update dependencies
+
+salt-formula-keystone (2016.12.1-1) unstable; urgency=medium
+
+  * New upstream release
+  * d/{control,copyright}: Use my @debian.org email address
+  * Bumped debhelper version to 10
+
+ -- Ondřej Nový <onovy@debian.org>  Sun, 25 Dec 2016 17:05:55 +0100
+
+salt-formula-keystone (2016.4.1-3) unstable; urgency=medium
+
+  * Added Debian tests
+
+ -- Ondřej Nový <novy@ondrej.org>  Wed, 08 Jun 2016 21:27:20 +0200
+
+salt-formula-keystone (2016.4.1-2) unstable; urgency=medium
+
+  * d/copyright: Added myself to Debian part
+  * Added myself as uploader
+
+ -- Ondřej Nový <novy@ondrej.org>  Wed, 11 May 2016 23:51:48 +0200
+
+salt-formula-keystone (2016.4.1-1) unstable; urgency=medium
+
+  * Initial release (Closes: #821919)
+
+ -- Filip Pytloun <filip@pytloun.cz>  Wed, 20 Apr 2016 16:04:33 +0200
