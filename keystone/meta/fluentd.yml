@@ -1,0 +1,162 @@
+{%- if pillar.get('fluentd', {}).get('agent', {}).get('enabled', False) %}
+{%- from "keystone/map.jinja" import server with context %}
+{%- set positiondb = pillar.fluentd.agent.dir.positiondb %}
+agent:
+  config:
+    label:
+      forward_input:
+        input:
+          generic_forward_input:
+            type: forward
+            bind: 0.0.0.0
+            port: 24224
+        match:
+          route_openstack_keystone:
+            tag: openstack.keystone
+            type: relabel
+            label: openstack_keystone
+{%- if server.service_name in ['apache2', 'httpd'] %}
+      openstack_keystone_wsgi:
+        input:
+          keystone_api_wsgi_in_tail:
+            type: tail
+            path: /var/log/apache2/keystone.access.log
+            tag: openstack.keystone
+            pos_file: {{ positiondb }}/keystone.wsgi.pos
+            parser:
+              type: regexp
+              time_key: Timestamp
+              time_format: '%d/%b/%Y:%H:%M:%S %z'
+              keep_time_key: false
+              # Apache format: https://regex101.com/r/WeCT7s/5
+              format: '/(?<hostname>[\w\.\-]+)\:(?<port>\d+)\s(?<http_client_ip_address>[\d\.]+)\s\-\s\-\s\[(?<Timestamp>.*)\]\s(?<Payload>\"(?<http_method>[A-Z]+)\s(?<http_url>\S+)\s(?<http_version>[.\/\dHTFSP]+)\"\s(?<http_status>\d{3})\s(?<http_response_time>\d+)\s(?<http_response_size>\d+)\s\"(?<http_referer>.*)\"\s\"(?<user_agent>.*)\")/'
+        filter:
+          add_keystone_wsgi_record_fields:
+            tag: openstack.keystone
+            type: record_transformer
+            enable_ruby: true
+            record:
+              - name: Severity
+                value: 6
+              - name: severity_label
+                value: INFO
+              - name: programname
+                value: keystone-wsgi
+              - name: http_response_time
+                value: ${ record['http_response_time'].to_i/100000.to_f }
+        match:
+          send_to_default:
+            tag: openstack.keystone
+            type: copy
+            store:
+              - type: relabel
+                label: default_output
+              - type: rewrite_tag_filter
+                rule:
+                  - name: severity_label
+                    regexp: '.'
+                    result: metric.keystone_log_messages
+              - type: rewrite_tag_filter
+                rule:
+                  - name: http_status
+                    regexp: '.'
+                    result: metric.keystone_openstack_http_response
+          push_to_metric:
+            tag: 'metric.**'
+            type: relabel
+            label: default_metric
+{%- endif %}
+      openstack_keystone:
+        filter:
+          set_log_record_fields:
+            tag: openstack.keystone
+            type: record_transformer
+            enable_ruby: true
+            record:
+              - name: Severity
+                value: ${ {'TRACE'=>7,'DEBUG'=>7,'INFO'=>6,'AUDIT'=>6,'WARNING'=>4,'ERROR'=>3,'CRITICAL'=>2}[record['level']].to_i }
+              - name: severity_label
+                value: ${ record['level'] }
+              - name: programname
+                value: keystone
+              - name: Payload
+                value: ${ record['message'] }
+              - name: python_module
+                value: ${ record['name'] }
+          parse_http_stats:
+            tag: openstack.keystone
+            type: parser
+            key_name: Payload
+            reserve_data: true
+            emit_invalid_record_to_error: false
+            parser:
+              type: regexp
+              # Parse openstack http stats: https://regex101.com/r/Tf0XUK/1/
+              format: '\"(?<http_method>GET|POST|OPTIONS|DELETE|PUT|HEAD|TRACE|CONNECT|PATCH)\s(?<http_url>\S+)\s(?<http_version>[.\/\dHTFSP]+)\"\sstatus:\s(?<http_status>\d{3})\slen:\s(?<http_response_size>\d+)\stime:\s(?<http_response_time>\d+\.\d+)'
+              types: http_response_time:float
+        match:
+          unify_tag:
+            tag: openstack.keystone.*
+            type: rewrite_tag_filter
+            rule:
+              - name: level
+                regexp: '.*'
+                result: openstack.keystone
+          send_to_default:
+            tag: openstack.keystone
+            type: copy
+            store:
+              - type: relabel
+                label: default_output
+              - type: rewrite_tag_filter
+                rule:
+                  - name: severity_label
+                    regexp: '.'
+                    result: metric.keystone_log_messages
+              - type: rewrite_tag_filter
+                rule:
+                  - name: http_status
+                    regexp: '.'
+                    result: metric.keystone_openstack_http_response
+          push_to_metric:
+            tag: 'metric.**'
+            type: relabel
+            label: default_metric
+      default_metric:
+        filter:
+          keystone_logs_per_severity:
+            tag: metric.keystone_log_messages
+            require:
+              - add_general_fields
+            type: prometheus
+            metric:
+              - name: log_messages
+                type: counter
+                desc: Total number of log lines by severity
+            label:
+              - name: service
+                value: keystone
+              - name: level
+                value: ${severity_label}
+              - name: host
+                value: ${Hostname}
+          keystone_openstack_http_response_times:
+            tag: metric.keystone_openstack_http_response
+            require:
+              - add_general_fields
+            type: prometheus
+            metric:
+              - name: openstack_http_response_times
+                type: summary
+                desc: Total number of requests per method and status
+                key: http_response_time
+            label:
+              - name: http_method
+                value: ${http_method}
+              - name: http_status
+                value: ${http_status}
+              - name: service
+                value: keystone
+              - name: host
+                value: ${Hostname}
+{% endif %}

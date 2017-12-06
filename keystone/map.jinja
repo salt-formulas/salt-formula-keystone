@@ -21,7 +21,15 @@
         },
         'notification': False,
         'roles': ['admin', 'Member'],
-        'cacert': '/etc/ssl/certs/ca-certificates.crt'
+        'cacert': '/etc/ssl/certs/ca-certificates.crt',
+        'logging': {
+          'log_appender': false,
+          'log_handlers': {
+            'watchedfile': {
+              'enabled': true
+            }
+          },
+        },
     },
     'RedHat': {
         'pkgs': ['openstack-keystone', 'openstack-utils', 'python-keystone', 'python-keystoneclient', 'python-pycadf'],
@@ -37,7 +45,15 @@
         },
         'notification': False,
         'roles': ['admin', 'Member'],
-        'cacert': '/etc/pki/tls/certs/ca-bundle.crt'
+        'cacert': '/etc/pki/tls/certs/ca-bundle.crt',
+        'logging': {
+          'log_appender': false,
+          'log_handlers': {
+            'watchedfile': {
+              'enabled': true
+            }
+          },
+        },
     },
 }, merge=pillar.keystone.get('server', {}), base='BaseDefaults') %}
 

@@ -109,16 +109,40 @@ keystone_group:
   - watch_in:
     - service: {{ keystone_service }}
 
-/etc/keystone/policy.json:
-  file.managed:
-  - user: keystone
-  - group: keystone
-  - require:
-    - pkg: keystone_packages
-  - watch_in:
-    - service: {{ keystone_service }}
+{%- if server.logging.log_appender %}
+
+{%- if server.logging.log_handlers.get('fluentd', {}).get('enabled', False) %}
+keystone_fluentd_logger_package:
+  pkg.installed:
+    - name: python-fluent-logger
+{%- endif %}
 
 /etc/keystone/logging.conf:
+  file.managed:
+    - user: keystone
+    - group: keystone
+    - source: salt://keystone/files/logging.conf
+    - template: jinja
+    - defaults:
+        values: {{ server }}
+    - require:
+      - pkg: keystone_packages
+{%- if server.logging.log_handlers.get('fluentd', {}).get('enabled', False) %}
+      - pkg: keystone_fluentd_logger_package
+{%- endif %}
+    - watch_in:
+      - service: {{ keystone_service }}
+
+/var/log/keystone/keystone.log:
+  file.managed:
+    - user: keystone
+    - group: keystone
+    - watch_in:
+      - service: {{ keystone_service }}
+
+{%- endif %}
+
+/etc/keystone/policy.json:
   file.managed:
   - user: keystone
   - group: keystone
