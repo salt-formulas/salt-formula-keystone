@@ -1,4 +1,4 @@
-{%- from "keystone/map.jinja" import server, system_cacerts_file with context %}
+{%- from "keystone/map.jinja" import server with context %}
 {%- if server.enabled %}
 
 keystone_packages:
@@ -449,7 +449,7 @@ mysql_ca_keystone_server:
       - file: /etc/keystone/keystone.conf
 {%- else %}
   file.exists:
-   - name: {{ server.database.ssl.get('cacert_file', system_cacerts_file) }}
+   - name: {{ server.database.ssl.get('cacert_file', server.cacert_file) }}
    - require_in:
      - file: /etc/keystone/keystone.conf
 {% endif %}
@@ -466,7 +466,7 @@ rabbitmq_ca_keystone_server:
     - makedirs: true
 {%- else %}
   file.exists:
-   - name: {{ server.message_queue.ssl.get('cacert_file', system_cacerts_file) }}
+   - name: {{ server.message_queue.ssl.get('cacert_file', server.cacert_file) }}
 {%- endif %}
 {%- endif %}
 

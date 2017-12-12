@@ -1,4 +1,4 @@
-{% from "keystone/map.jinja" import server, system_cacerts_file with context %}
+{% from "keystone/map.jinja" import server with context %}
 [DEFAULT]
 
 #
@@ -601,7 +601,7 @@ allow_headers = {{ server.cors.allow_headers }}
 # Deprecated group/name - [DATABASE]/sql_connection
 # Deprecated group/name - [sql]/connection
 #connection = <None>
-connection={{ server.database.engine }}://{{ server.database.user }}:{{ server.database.password }}@{{ server.database.host }}/{{ server.database.name }}{%- if server.database.get('ssl',{}).get('enabled',False) %}?ssl_ca={{ server.database.ssl.get('cacert_file', system_cacerts_file) }}{% endif %}
+connection={{ server.database.engine }}://{{ server.database.user }}:{{ server.database.password }}@{{ server.database.host }}/{{ server.database.name }}{%- if server.database.get('ssl',{}).get('enabled',False) %}?ssl_ca={{ server.database.ssl.get('cacert_file', server.cacert_file) }}{% endif %}
 
 # The SQLAlchemy connection string to use to connect to the slave database.
 # (string value)
@@ -1597,11 +1597,7 @@ kombu_ssl_version = {{ server.message_queue.ssl.version }}
 kombu_ssl_version = TLSv1_2
 {%- endif %}
 
-{%- if server.message_queue.ssl.cacert_file is defined %}
-kombu_ssl_ca_certs = {{ server.message_queue.ssl.cacert_file }}
-{%- else %}
-kombu_ssl_ca_certs={{ system_cacerts_file }}
-{%- endif %}
+kombu_ssl_ca_certs = {{ server.message_queue.ssl.get('cacert_file', server.cacert_file) }}
 {%- endif %}
 
 # RabbitMQ HA cluster host:port pairs. (list value)

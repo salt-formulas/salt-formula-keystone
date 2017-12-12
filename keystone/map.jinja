@@ -1,9 +1,12 @@
-{%- set system_cacerts_file = salt['grains.filter_by']({
-    'Debian': '/etc/ssl/certs/ca-certificates.crt',
-    'RedHat': '/etc/pki/tls/certs/ca-bundle.crt'
-})%}
+{%- set default_params = {
+    'cacert_file': salt['grains.filter_by']({
+        'Debian': '/etc/ssl/certs/ca-certificates.crt',
+        'RedHat': '/etc/pki/tls/certs/ca-bundle.crt'
+    })}
+%}
 
 {% set server = salt['grains.filter_by']({
+    'BaseDefaults': default_params,
     'Debian': {
         'pkgs': ['keystone', 'python-keystone', 'python-keystoneclient', 'python-psycopg2', 'python-mysqldb', 'mysql-client', 'python-six', 'python-memcache', 'python-openstackclient', 'gettext-base', 'python-pycadf'],
         'service_name': 'keystone',
@@ -36,7 +39,7 @@
         'roles': ['admin', 'Member'],
         'cacert': '/etc/pki/tls/certs/ca-bundle.crt'
     },
-}, merge=pillar.keystone.get('server', {})) %}
+}, merge=pillar.keystone.get('server', {}), base='BaseDefaults') %}
 
 {% set client = salt['grains.filter_by']({
     'Debian': {
