@@ -48,7 +48,7 @@ doc:
           value: |
             {%- for pkg in server.pkgs %}
             {%- set pkg_version = "dpkg -l "+pkg+" | grep "+pkg+" | awk '{print $3}'" %}
-            * {{ pkg }}: {{ salt['cmd.run'](pkg_version) }}
+            * {{ pkg }}: {{ salt['cmd.shell'](pkg_version) }}
             {%- endfor %}
   {%- endif %}
   {%- if pillar.keystone.control is defined %}

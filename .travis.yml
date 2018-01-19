@@ -17,13 +17,17 @@ install:
   - bundle install
 
 env:
-  - PLATFORM=trevorj/salty-whales:trusty MYSQL_VERSION='5.5' SUITE=single
+#  - PLATFORM=trevorj/salty-whales:trusty-2017.7 MYSQL_VERSION='5.5' SUITE=single
+  - PLATFORM=trevorj/salty-whales:xenial-2017.7 MYSQL_VERSION='5.7' SUITE=single
+#  - PLATFORM=trevorj/salty-whales:trusty-2017.7 MYSQL_VERSION='5.5' SUITE=single_domain
+  - PLATFORM=trevorj/salty-whales:xenial-2017.7 MYSQL_VERSION='5.7' SUITE=single_domain
+#  - PLATFORM=trevorj/salty-whales:trusty-2017.7 MYSQL_VERSION='5.5' SUITE=single_fernet
+  - PLATFORM=trevorj/salty-whales:xenial-2017.7 MYSQL_VERSION='5.7' SUITE=single_fernet
+#  - PLATFORM=trevorj/salty-whales:trusty-2017.7 MYSQL_VERSION='5.5' SUITE=under-apache
+  - PLATFORM=trevorj/salty-whales:xenial-2017.7 MYSQL_VERSION='5.7' SUITE=under-apache
   - PLATFORM=trevorj/salty-whales:xenial MYSQL_VERSION='5.7' SUITE=single
-  - PLATFORM=trevorj/salty-whales:trusty MYSQL_VERSION='5.5' SUITE=single_domain
   - PLATFORM=trevorj/salty-whales:xenial MYSQL_VERSION='5.7' SUITE=single_domain
-  - PLATFORM=trevorj/salty-whales:trusty MYSQL_VERSION='5.5' SUITE=single_fernet
   - PLATFORM=trevorj/salty-whales:xenial MYSQL_VERSION='5.7' SUITE=single_fernet
-  - PLATFORM=trevorj/salty-whales:trusty MYSQL_VERSION='5.5' SUITE=under-apache
   - PLATFORM=trevorj/salty-whales:xenial MYSQL_VERSION='5.7' SUITE=under-apache
 
 before_script:
