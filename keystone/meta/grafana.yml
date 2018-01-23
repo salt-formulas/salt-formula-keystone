@@ -1,8 +1,15 @@
 dashboard:
+{%- if pillar.get('fluentd', {}).get('agent', {}).get('enabled', False) %}
+  keystone_prometheus:
+    datasource: prometheus
+    format: json
+    template: keystone/files/grafana_dashboards/keystone_prometheus_fluentd.json
+{%- else %}
   keystone_prometheus:
     datasource: prometheus
     format: json
     template: keystone/files/grafana_dashboards/keystone_prometheus.json
+{%- endif %}
   keystone_influxdb:
     datasource: influxdb
     format: json

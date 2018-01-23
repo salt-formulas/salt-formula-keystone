@@ -81,7 +81,7 @@
 {% set monitoring = salt['grains.filter_by']({
     'default': {
         'error_log_rate': 0.2,
-        'http_response_time_p90': 0.3,
+        'http_response_time_p90': 3,
         'failed_auths': {
             'percentage': 50,
             'all_auths_rate': 0.1,

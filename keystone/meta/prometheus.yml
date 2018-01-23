@@ -29,7 +29,7 @@ server:
 {%- endraw %}
       {%- set log_threshold = monitoring.error_log_rate|float %}
       if: >-
-        sum(rate(log_messages{service="keystone",level=~"error|emergency|fatal"}[5m])) without (level) > {{ log_threshold }}
+        sum(rate(log_messages{service="keystone",level=~"(?i:(error|emergency|fatal))"}[5m])) without (level) > {{ log_threshold }}
 {%- raw %}
       labels:
         severity: warning
@@ -52,7 +52,7 @@ server:
     KeystoneAPITooSlow:
       {%- set response_time_threshold = monitoring.http_response_time_p90|float %}
       if: >-
-        max by(host) (openstack_keystone_http_response_times_upper_90{http_method=~"^(GET|POST)$",http_status="2xx"}) >= {{ response_time_threshold }}
+        max by(host) (openstack_http_response_times{service='keystone',quantile="0.9",http_method=~"^(GET|POST)$",http_status=~"^2..$"}) >= {{ response_time_threshold }}
 {%- raw %}
       for: 2m
       labels:
