@@ -6,6 +6,7 @@ parameters:
   _param:
     openstack_log_appender: false
     openstack_fluentd_handler_enabled: false
+    keystone_service_protocol: http
   keystone:
     server:
       enabled: true
@@ -20,6 +21,7 @@ parameters:
         address: 0.0.0.0
         private_address: ${_param:keystone_service_host}
         private_port: 35357
+        private_protocol: ${_param:keystone_service_protocol}
         public_address: ${_param:keystone_service_host}
         public_port: 5000
       region: RegionOne

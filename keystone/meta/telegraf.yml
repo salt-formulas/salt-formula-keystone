@@ -9,15 +9,15 @@ remote_agent:
       region: "{{ server.region }}"
       username: "{{ server.admin_name }}"
       password: "{{ server.admin_password }}"
-      identity_endpoint: "http://{{ server.bind.private_address|replace('0.0.0.0', '127.0.0.1') }}:{{ server.bind.private_port }}/v{% if server.get('api_version', 2)|int == 2 %}2.0{% else %}3{% endif %}"
+      identity_endpoint: "{{ server.bind.private_protocol }}://{{ server.bind.private_address|replace('0.0.0.0', '127.0.0.1') }}:{{ server.bind.private_port }}/v{% if server.get('api_version', 2)|int == 2 %}2.0{% else %}3{% endif %}"
       monitor_agents: "true"
 agent:
   input:
     http_response:
       keystone-public-api:
-        address: "http://{{ server.bind.address|replace('0.0.0.0', '127.0.0.1') }}:{{ server.bind.public_port }}/"
+        address: "{{ server.bind.public_protocol }}://{{ server.bind.address|replace('0.0.0.0', '127.0.0.1') }}:{{ server.bind.public_port }}/"
         expected_code: 300
       keystone-admin-api:
-        address: "http://{{ server.bind.address|replace('0.0.0.0', '127.0.0.1') }}:{{ server.bind.private_port }}/"
+        address: "{{ server.bind.private_protocol }}://{{ server.bind.address|replace('0.0.0.0', '127.0.0.1') }}:{{ server.bind.private_port }}/"
         expected_code: 300
 {%- endif %}
