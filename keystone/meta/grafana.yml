@@ -44,7 +44,7 @@ dashboard:
               type: dashboard
             target:
               cluster_status:
-                expr: avg(openstack_api_check_status{service=~\"keystone.*public.*\"})
+                expr: avg(openstack_api_check_status{service=~"keystone.*public.*"})
   service_level:
     datasource: influxdb
     row:
