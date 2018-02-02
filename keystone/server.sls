@@ -338,7 +338,7 @@ keystone_credential_setup:
 {%- if not salt['pillar.get']('linux:system:repo:mirantis_openstack', False) %}
 
 keystone_service_tenant:
-  keystone.tenant_present:
+  keystoneng.tenant_present:
   - name: {{ server.service_tenant }}
   - connection_token: {{ server.service_token }}
   - connection_endpoint: 'http://{{ server.bind.address }}:{{ server.bind.private_port }}/v2.0'
@@ -346,25 +346,25 @@ keystone_service_tenant:
     - cmd: keystone_syncdb
 
 keystone_admin_tenant:
-  keystone.tenant_present:
+  keystoneng.tenant_present:
   - name: {{ server.admin_tenant }}
   - connection_token: {{ server.service_token }}
   - connection_endpoint: 'http://{{ server.bind.address }}:{{ server.bind.private_port }}/v2.0'
   - require:
-    - keystone: keystone_service_tenant
+    - keystoneng: keystone_service_tenant
 
 keystone_roles:
-  keystone.role_present:
+  keystoneng.role_present:
   - names: {{ server.roles }}
   - connection_token: {{ server.service_token }}
   - connection_endpoint: 'http://{{ server.bind.address }}:{{ server.bind.private_port }}/v2.0'
   - require:
-    - keystone: keystone_service_tenant
+    - keystoneng: keystone_service_tenant
 
 {%- if not server.get('ldap', {}).get('read_only', False) %}
 
 keystone_admin_user:
-  keystone.user_present:
+  keystoneng.user_present:
   - name: {{ server.admin_name }}
   - password: {{ server.admin_password }}
   - email: {{ server.admin_email }}
@@ -375,8 +375,8 @@ keystone_admin_user:
   - connection_token: {{ server.service_token }}
   - connection_endpoint: 'http://{{ server.bind.address }}:{{ server.bind.private_port }}/v2.0'
   - require:
-    - keystone: keystone_admin_tenant
-    - keystone: keystone_roles
+    - keystoneng: keystone_admin_tenant
+    - keystoneng: keystone_roles
 
 {%- endif %}
 
@@ -385,17 +385,17 @@ keystone_admin_user:
 {%- for service_name, service in server.get('service', {}).iteritems() %}
 
 keystone_{{ service_name }}_service:
-  keystone.service_present:
+  keystoneng.service_present:
   - name: {{ service_name }}
   - service_type: {{ service.type }}
   - description: {{ service.description }}
   - connection_token: {{ server.service_token }}
   - connection_endpoint: 'http://{{ server.bind.address }}:{{ server.bind.private_port }}/v2.0'
   - require:
-    - keystone: keystone_roles
+    - keystoneng: keystone_roles
 
 keystone_{{ service_name }}_{{ service.get('region', 'RegionOne') }}_endpoint:
-  keystone.endpoint_present:
+  keystoneng.endpoint_present:
   - name: {{ service.get('service', service_name) }}
   - publicurl: '{{ service.bind.get('public_protocol', 'http') }}://{{ service.bind.public_address }}:{{ service.bind.public_port }}{{ service.bind.public_path }}'
   - internalurl: '{{ service.bind.get('internal_protocol', 'http') }}://{{ service.bind.internal_address }}:{{ service.bind.internal_port }}{{ service.bind.internal_path }}'
@@ -404,12 +404,12 @@ keystone_{{ service_name }}_{{ service.get('region', 'RegionOne') }}_endpoint:
   - connection_token: {{ server.service_token }}
   - connection_endpoint: 'http://{{ server.bind.address }}:{{ server.bind.private_port }}/v2.0'
   - require:
-    - keystone: keystone_{{ service_name }}_service
+    - keystoneng: keystone_{{ service_name }}_service
 
 {% if service.user is defined %}
 
 keystone_user_{{ service.user.name }}:
-  keystone.user_present:
+  keystoneng.user_present:
   - name: {{ service.user.name }}
   - password: {{ service.user.password }}
   - email: {{ server.admin_email }}
@@ -420,7 +420,7 @@ keystone_user_{{ service.user.name }}:
   - connection_token: {{ server.service_token }}
   - connection_endpoint: 'http://{{ server.bind.address }}:{{ server.bind.private_port }}/v2.0'
   - require:
-    - keystone: keystone_roles
+    - keystoneng: keystone_roles
 
 {% endif %}
 
@@ -429,17 +429,17 @@ keystone_user_{{ service.user.name }}:
 {%- for tenant_name, tenant in server.get('tenant', {}).iteritems() %}
 
 keystone_tenant_{{ tenant_name }}:
-  keystone.tenant_present:
+  keystoneng.tenant_present:
   - name: {{ tenant_name }}
   - connection_token: {{ server.service_token }}
   - connection_endpoint: 'http://{{ server.bind.address }}:{{ server.bind.private_port }}/v2.0'
   - require:
-    - keystone: keystone_roles
+    - keystoneng: keystone_roles
 
 {%- for user_name, user in tenant.get('user', {}).iteritems() %}
 
 keystone_user_{{ user_name }}:
-  keystone.user_present:
+  keystoneng.user_present:
   - name: {{ user_name }}
   - password: {{ user.password }}
   - email: {{ user.get('email', 'root@localhost') }}
@@ -454,7 +454,7 @@ keystone_user_{{ user_name }}:
   - connection_token: {{ server.service_token }}
   - connection_endpoint: 'http://{{ server.bind.address }}:{{ server.bind.private_port }}/v2.0'
   - require:
-    - keystone: keystone_tenant_{{ tenant_name }}
+    - keystoneng: keystone_tenant_{{ tenant_name }}
 
 {%- endfor %}
 

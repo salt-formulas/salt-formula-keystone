@@ -15,13 +15,13 @@ minion:
   keystone:
     {%- if pillar.keystone.get('server', {'enabled': False}).enabled %}
     keystone.token: '{{ server.service_token }}'
-    keystone.endpoint: '{{ server.bind.private_protocol }}://{{ server.bind.address }}:{{ server.bind.private_port }}/v2.0'
+    keystone.endpoint: '{{ server.bind.private_protocol }}://{{ server.bind.address }}:{{ server.bind.private_port }}/{{ server.bind.get('private_api_version', 'v2.0') }}'
     {%- else %}
       {%- if client.get('server', {}).get('user') %}
     keystone.user: '{{ client.server.user }}'
     keystone.password: '{{ client.server.password }}'
     keystone.tenant: '{{ client.server.tenant }}'
-    keystone.auth_url: '{{ client.server.get('public_protocol', 'http') }}://{{ client.server.host }}:{{ client.server.public_port }}/v2.0/'
+    keystone.auth_url: '{{ client.server.get('public_protocol', 'http') }}://{{ client.server.host }}:{{ client.server.public_port }}/{{ client.server.get('public_api_version', 'v2.0') }}'
       {%- endif %}
     {%- endif %}
 
@@ -30,9 +30,13 @@ minion:
       {%- set protocol = identity.admin.get('protocol', 'http') %}
 
       {%- if identity.admin.get('api_version', '2') == '3' %}
-        {%- set version = "v3" %}
-      {%- else %}
-        {%- set version = "v2.0" %}
+        {%- set version = "/v3" %}
+      {%- endif %}
+      {%- if identity.admin.get('api_version', '2') == '2' %}
+        {%- set version = "/v2.0" %}
+      {%- endif %}
+      {%- if identity.admin.get('api_version', '2') == '' %}
+        {%- set version = "" %}
       {%- endif %}
 
       {%- if identity.admin.user is defined %}
@@ -42,7 +46,7 @@ minion:
       keystone.user: '{{ identity.admin.user }}'
       keystone.password: '{{ identity.admin.password }}'
       keystone.tenant: '{{ identity.admin.project }}'
-      keystone.auth_url: '{{ protocol+'://'+identity.admin.host+':'+identity.admin.port|string+'/'+version }}'
+      keystone.auth_url: '{{ protocol+'://'+identity.admin.host+':'+identity.admin.port|string+version }}'
       keystone.region_name: '{{ identity.admin.region_name }}'
       keystone.use_keystoneauth: {{ identity.admin.get('use_keystoneauth', false) }}
 
