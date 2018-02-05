@@ -28,8 +28,8 @@ agent:
               time_key: Timestamp
               time_format: '%d/%b/%Y:%H:%M:%S %z'
               keep_time_key: false
-              # Apache format: https://regex101.com/r/WeCT7s/5
-              format: '/(?<hostname>[\w\.\-]+)\:(?<port>\d+)\s(?<http_client_ip_address>[\d\.]+)\s\-\s\-\s\[(?<Timestamp>.*)\]\s(?<Payload>\"(?<http_method>[A-Z]+)\s(?<http_url>\S+)\s(?<http_version>[.\/\dHTFSP]+)\"\s(?<http_status>\d{3})\s(?<http_response_time>\d+)\s(?<http_response_size>\d+)\s\"(?<http_referer>.*)\"\s\"(?<user_agent>.*)\")/'
+              # Apache keystone format: https://regex101.com/r/KkL3my/1/
+              format: '/(?<hostname>[\w\.\-]+)\:(?<port>\d+)\s(-\s){0,1}(?<http_client_ip_address>[\d\.]+)\s\-\s\-\s\[(?<Timestamp>.*)\]\s(?<Payload>\"(?<http_method>[A-Z]+)\s(?<http_url>\S+)\s(?<http_version>[.\/\dHTFSP]+)\"\s(?<http_status>\d{3})\s(?<http_response_time>\d+)\s(?<http_response_size>\d+)\s\"(?<http_referer>.*)\"\s\"(?<user_agent>.*)\")/'
         filter:
           add_keystone_wsgi_record_fields:
             tag: openstack.keystone
@@ -91,8 +91,8 @@ agent:
             emit_invalid_record_to_error: false
             parser:
               type: regexp
-              # Parse openstack http stats: https://regex101.com/r/Tf0XUK/1/
-              format: '\"(?<http_method>GET|POST|OPTIONS|DELETE|PUT|HEAD|TRACE|CONNECT|PATCH)\s(?<http_url>\S+)\s(?<http_version>[.\/\dHTFSP]+)\"\sstatus:\s(?<http_status>\d{3})\slen:\s(?<http_response_size>\d+)\stime:\s(?<http_response_time>\d+\.\d+)'
+              # Parse openstack http stats: https://regex101.com/r/Tf0XUK/6
+              format: '\"(?<http_method>GET|POST|OPTIONS|DELETE|PUT|HEAD|TRACE|CONNECT|PATCH)\s(?<http_url>\S+)\s(?<http_version>[.\/\dHTFSP]+)\"(\s+status:|)\s(?<http_status>\d{3})(\s+len:|)\s(?<http_response_size>\d+)(\s+time:|)\s(?<http_response_time>\d+\.\d+)'
               types: http_response_time:float
         match:
           unify_tag:
