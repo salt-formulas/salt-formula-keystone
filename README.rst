@@ -230,6 +230,28 @@ Using LDAP backend for default domain
           uid: keystone
           password: password
 
+Using LDAP backend for default domain with "user_enabled" field emulation
+
+.. code-block:: yaml
+
+    keystone:
+      server:
+        backend: ldap
+        assignment:
+          backend: sql
+        ldap:
+          url: "ldap://idm.domain.com"
+          suffix: "ou=Openstack Service Users,o=domain.com"
+          bind_user: keystone
+          password: password
+          # Define LDAP "group" object class and "membership" attribute
+          group_objectclass: groupOfUniqueNames
+          group_member_attribute: uniqueMember
+          # User will receive "enabled" attribute basing on membership in "os-user-enabled" group
+          user_enabled_emulation: True
+          user_enabled_emulation_dn: "cn=os-user-enabled,ou=Openstack,o=domain.com"
+          user_enabled_emulation_use_group_config: True
+
 Simple service endpoint definition (defaults to RegionOne)
 
 .. code-block:: yaml
