@@ -67,6 +67,8 @@ Management of Keystone users
 
 '''
 
+# Import 3rd-party libs
+from salt.ext import six
 
 def __virtual__():
     '''
@@ -392,9 +394,17 @@ def tenant_present(name, description=None, enabled=True, profile=None,
         else:
             created = __salt__['keystoneng.tenant_create'](name=name, description=description, enabled=enabled,
                                                          profile=profile, **connection_args)
-        ret['changes']['Tenant'] = 'Created' if created is True else 'Failed'
-        ret['result'] = created
-        ret['comment'] = 'Tenant / project "{0}" has been added'.format(name)
+        # If tenant has been created succesfully 'created' is:
+        #      {u'test_tenant3': {'enabled': True, 'NAME_ATTR': 'name', 'HUMAN_ID': False, 'name': u'test_tenant3', 'id': u'0a5f319f8a794bfc9045746069c76fd8'}}
+        # If tenant is not created:
+        #      {'Error': 'Unable to resolve tenant id'}
+        if 'Error' in created and isinstance(created['Error'], six.string_types):
+            ret['result'] = False
+            ret['comment'] = 'Cannot create tenant / project "{0}"'.format(name)
+        else:
+            ret['changes']['Tenant'] = 'Created'
+            ret['result'] = True
+            ret['comment'] = 'Tenant / project "{0}" has been added'.format(name)
     return ret
 
 
