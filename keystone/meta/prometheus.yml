@@ -37,18 +37,6 @@ server:
       annotations:
         summary: 'Too many errors in {{ $labels.service }} logs'
         description: 'The rate of errors in {{ $labels.service }} logs over the last 5 minutes is too high on node {{ $labels.host }} (current value={{ $value }}, threshold={%- endraw %}{{ log_threshold }}).'
-    KeystoneFailedAuthsTooHigh:
-      {%- set auth_threshold = monitoring.failed_auths.percentage %}
-      {%- set rate_threshold = monitoring.failed_auths.all_auths_rate|float %}
-      if: >-
-        rate(authentications_total_failed[5m]) > rate(authentications_total_all[5m]) * {{ auth_threshold }} / 100 and rate(authentications_total_all[5m]) > {{ rate_threshold }}
-{%- raw %}
-      labels:
-        severity: warning
-        service: keystone
-      annotations:
-        summary: 'Too many failed authentications in Keystone'
-        description: 'The rate of failed authentications in Keystone over the last 5 minutes is too high (current value={{ $value }}, threshold={%- endraw %}{{ auth_threshold }}).'
     KeystoneAPITooSlow:
       {%- set response_time_threshold = monitoring.http_response_time_p90|float %}
       if: >-
