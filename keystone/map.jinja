@@ -90,5 +90,6 @@
             'percentage': 50,
             'all_auths_rate': 0.1,
         },
+        'telegraf_openstack_input_plugin_interval': '1m',
     },
 }, grain='os_family', merge=salt['pillar.get']('keystone:monitoring')) %}

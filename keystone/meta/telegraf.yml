@@ -1,9 +1,9 @@
-{%- from "keystone/map.jinja" import server with context %}
+{%- from "keystone/map.jinja" import monitoring, server with context %}
 {%- if server is defined and server.get('enabled', False) %}
 remote_agent:
   input:
     openstack:
-      interval: '1m'
+      interval: "{{ monitoring.telegraf_openstack_input_plugin_interval }}"
       project: "{{ server.admin_tenant }}"
       tenant: "{{ server.admin_tenant }}"
       region: "{{ server.region }}"
