@@ -993,7 +993,9 @@
   "schemaVersion": 14,
   "sharedCrosshair": true,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "openstack"
+  ],
   "templating": {
     "list": [
       {
