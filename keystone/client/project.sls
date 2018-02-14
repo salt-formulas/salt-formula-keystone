@@ -11,7 +11,7 @@ keystone_client_roles:
   - connection_tenant: {{ client.server.tenant }}
   - connection_auth_url: 'http://{{ client.server.host }}:{{ client.server.public_port }}/v2.0/'
 
-{%- for tenant_name, tenant in client.get('tenant', {}).iteritems() %}
+{%- for tenant_name, tenant in client.get('tenant', {}).items() %}
 
 keystone_tenant_{{ tenant_name }}:
   keystoneng.tenant_present:
@@ -23,7 +23,7 @@ keystone_tenant_{{ tenant_name }}:
   - require:
     - keystoneng: keystone_client_roles
 
-{%- for user_name, user in tenant.get('user', {}).iteritems() %}
+{%- for user_name, user in tenant.get('user', {}).items() %}
 
 keystone_{{ tenant_name }}_user_{{ user_name }}:
   keystoneng.user_present:

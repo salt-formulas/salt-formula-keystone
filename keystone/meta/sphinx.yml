@@ -41,7 +41,7 @@ doc:
           value: {{ server.database.user }}@{{ server.database.host }}:3306/{{ server.database.name }}
         services:
           value: |
-            {%- for service_name, service in server.get('service', {}).iteritems() %}
+            {%- for service_name, service in server.get('service', {}).items() %}
             * {{ service_name }}: {{ service.type }}, publicurl '{{ service.bind.get('public_protocol', 'http') }}://{{ service.bind.public_address }}:{{ service.bind.public_port }}{{ service.bind.public_path }}'
             {%- endfor %}
         packages:

@@ -26,7 +26,7 @@ minion:
     {%- endif %}
 
     {#- Profile based metadata #}
-    {%- for profile_name, identity in client.get('server', {}).iteritems() %}
+    {%- for profile_name, identity in client.get('server', {}).items() %}
       {%- set protocol = identity.admin.get('protocol', 'http') %}
 
       {%- if identity.admin.get('api_version', '2') == '3' %}

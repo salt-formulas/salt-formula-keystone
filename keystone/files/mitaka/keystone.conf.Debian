@@ -945,7 +945,7 @@ max_active_keys={{ server.tokens.get('max_active_keys', '3') }}
 # exist to order to maintain support for your v2 clients. (string value)
 #default_domain_id = default
 {%- if server.get('domain', {}) %}
-{%- for name, domain in server.domain.iteritems() %}
+{%- for name, domain in server.domain.items() %}
 {%- if domain.get('default', False) %}
 default_domain_id = {{ name }}
 {%- endif %}
@@ -2241,9 +2241,9 @@ hash_algorithm = {{ server.hash_algorithm }}
 Distribution = Ubuntu
 
 {% if server.extra_config is defined %}
-{%- for section, params in server.extra_config.iteritems() %}
+{%- for section, params in server.extra_config.items() %}
 [{{ section }}]
-{%- for param, value in params.iteritems() %}
+{%- for param, value in params.items() %}
 {{ param }} = {{ value }}
 {%- endfor %}
 {%- endfor %}

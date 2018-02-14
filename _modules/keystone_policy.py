@@ -1,6 +1,7 @@
 import io
 import json
 import logging
+import sys
 
 LOG = logging.getLogger(__name__)
 
@@ -45,7 +46,7 @@ class OrderedDictYAMLLoader(yaml.Loader):
             key = self.construct_object(key_node, deep=deep)
             try:
                 hash(key)
-            except TypeError, exc:
+            except TypeError as exc:
                 raise yaml.constructor.ConstructorError('while constructing a mapping',
                     node.start_mark, 'found unacceptable key (%s)' % exc, key_node.start_mark)
             value = self.construct_object(value_node, deep=deep)
@@ -81,7 +82,10 @@ def rule_delete(name, path, **kwargs):
                     serialized = json.dumps(rules, indent=4)
                 else:
                     serialized = yaml.safe_dump(rules, indent=4)
-                file_handle.write(unicode(serialized))
+                if sys.version_info[0] >= 3:
+                    file_handle.write(serialized)
+                else:
+                    file_handle.write(unicode(serialized))
         except Exception as e:
             msg = "Unable to save policy file: %s" % repr(e)
             LOG.error(msg)
@@ -102,7 +106,10 @@ def rule_set(name, rule, path, **kwargs):
                     serialized = json.dumps(rules, indent=4)
                 else:
                     serialized = yaml.safe_dump(rules, indent=4)
-                file_handle.write(unicode(serialized))
+                if sys.version_info[0] >= 3:
+                    file_handle.write(serialized)
+                else:
+                    file_handle.write(unicode(serialized))
         except Exception as e:
             msg = "Unable to save policy file %s: %s" % (path, repr(e))
             LOG.error(msg)
