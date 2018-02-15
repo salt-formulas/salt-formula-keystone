@@ -151,7 +151,7 @@ keystone_fluentd_logger_package:
   - watch_in:
     - service: {{ keystone_service }}
 
-{%- for name, rule in server.get('policy', {}).iteritems() %}
+{%- for name, rule in server.get('policy', {}).items() %}
 
 {%- if rule != None %}
 
@@ -188,7 +188,7 @@ rule_{{ name }}_absent:
     - require:
       - pkg: keystone_packages
 
-{%- for domain_name, domain in server.domain.iteritems() %}
+{%- for domain_name, domain in server.domain.items() %}
 
 /etc/keystone/domains/keystone.{{ domain_name }}.conf:
   file.managed:
@@ -382,7 +382,7 @@ keystone_admin_user:
 
 {%- endif %}
 
-{%- for service_name, service in server.get('service', {}).iteritems() %}
+{%- for service_name, service in server.get('service', {}).items() %}
 
 keystone_{{ service_name }}_service:
   keystoneng.service_present:
@@ -426,7 +426,7 @@ keystone_user_{{ service.user.name }}:
 
 {%- endfor %}
 
-{%- for tenant_name, tenant in server.get('tenant', {}).iteritems() %}
+{%- for tenant_name, tenant in server.get('tenant', {}).items() %}
 
 keystone_tenant_{{ tenant_name }}:
   keystoneng.tenant_present:
@@ -436,7 +436,7 @@ keystone_tenant_{{ tenant_name }}:
   - require:
     - keystoneng: keystone_roles
 
-{%- for user_name, user in tenant.get('user', {}).iteritems() %}
+{%- for user_name, user in tenant.get('user', {}).items() %}
 
 keystone_user_{{ user_name }}:
   keystoneng.user_present:

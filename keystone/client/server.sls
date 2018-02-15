@@ -1,7 +1,7 @@
 {%- from "keystone/map.jinja" import client with context %}
 {%- if client.enabled %}
 
-{%- for server_name, server in client.get('server', {}).iteritems() %}
+{%- for server_name, server in client.get('server', {}).items() %}
 
 {%- if server.admin.get('api_version', '2') == '3' %}
 {%- set version = "v3" %}
@@ -42,7 +42,7 @@ keystone_{{ server_name }}_roles:
 
 {%- endif %}
 
-{% for service_name, service in server.get('service', {}).iteritems() %}
+{% for service_name, service in server.get('service', {}).items() %}
 
 keystone_{{ server_name }}_service_{{ service_name }}:
   keystoneng.service_present:
@@ -84,7 +84,7 @@ keystone_{{ server_name }}_service_{{ service_name }}_endpoint_{{ endpoint.regio
 
 {%- endfor %}
 
-{%- for tenant_name, tenant in server.get('project', {}).iteritems() %}
+{%- for tenant_name, tenant in server.get('project', {}).items() %}
 
 keystone_{{ server_name }}_tenant_{{ tenant_name }}:
   keystoneng.tenant_present:
@@ -108,7 +108,7 @@ keystone_{{ server_name }}_tenant_{{ tenant_name }}_quota:
   novang.quota_present:
     - profile: {{ server_name }}
     - tenant_name: {{ tenant_name }}
-    {%- for quota_name, quota_value in tenant.quota.iteritems() %}
+    {%- for quota_name, quota_value in tenant.quota.items() %}
     - {{ quota_name }}: {{ quota_value }}
     {%- endfor %}
     - require:
@@ -116,7 +116,7 @@ keystone_{{ server_name }}_tenant_{{ tenant_name }}_quota:
 
 {%- endif %}
 
-{%- for user_name, user in tenant.get('user', {}).iteritems() %}
+{%- for user_name, user in tenant.get('user', {}).items() %}
 
 keystone_{{ server_name }}_tenant_{{ tenant_name }}_user_{{ user_name }}:
   keystoneng.user_present:

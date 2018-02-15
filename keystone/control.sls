@@ -1,5 +1,5 @@
 {%- from "keystone/map.jinja" import control with context %}
-{%- for provider_name, provider in control.get('provider', {}).iteritems() %}
+{%- for provider_name, provider in control.get('provider', {}).items() %}
 
 /root/keystonerc_{{ provider_name }}:
   file.managed:
