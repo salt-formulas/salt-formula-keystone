@@ -28,6 +28,15 @@ keystone:
       max_active_keys: 4
     notification: false
     notification_format: cadf
+    logging:
+      log_appender: false
+      log_handlers:
+        watchedfile:
+          enabled: true
+        fluentd:
+          enabled: false
+        ossyslog:
+          enabled: false
 # CI related dependencies
 mysql:
   client:

@@ -28,6 +28,15 @@ keystone:
       location: /etc/keystone/fernet-keys/
     notification: false
     notification_format: cadf
+    logging:
+      log_appender: false
+      log_handlers:
+        watchedfile:
+          enabled: true
+        fluentd:
+          enabled: false
+        ossyslog:
+          enabled: false
     extra_config:
       federation:
         cache_group_membership_in_db: true

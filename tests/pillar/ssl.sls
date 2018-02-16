@@ -32,6 +32,15 @@ keystone:
       location: /etc/keystone/fernet-keys/
     notification: true
     notification_format: cadf
+    logging:
+      log_appender: false
+      log_handlers:
+        watchedfile:
+          enabled: true
+        fluentd:
+          enabled: false
+        ossyslog:
+          enabled: false
     message_queue:
       engine: rabbitmq
       host: 127.0.0.1
