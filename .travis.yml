@@ -17,18 +17,18 @@ install:
   - bundle install
 
 env:
-#  - PLATFORM=trevorj/salty-whales:trusty-2017.7 MYSQL_VERSION='5.5' SUITE=single
-  - PLATFORM=trevorj/salty-whales:xenial-2017.7 MYSQL_VERSION='5.7' SUITE=single
-#  - PLATFORM=trevorj/salty-whales:trusty-2017.7 MYSQL_VERSION='5.5' SUITE=single_domain
-  - PLATFORM=trevorj/salty-whales:xenial-2017.7 MYSQL_VERSION='5.7' SUITE=single_domain
-#  - PLATFORM=trevorj/salty-whales:trusty-2017.7 MYSQL_VERSION='5.5' SUITE=single_fernet
-  - PLATFORM=trevorj/salty-whales:xenial-2017.7 MYSQL_VERSION='5.7' SUITE=single_fernet
-#  - PLATFORM=trevorj/salty-whales:trusty-2017.7 MYSQL_VERSION='5.5' SUITE=under-apache
-  - PLATFORM=trevorj/salty-whales:xenial-2017.7 MYSQL_VERSION='5.7' SUITE=under-apache
-  - PLATFORM=trevorj/salty-whales:xenial MYSQL_VERSION='5.7' SUITE=single
-  - PLATFORM=trevorj/salty-whales:xenial MYSQL_VERSION='5.7' SUITE=single_domain
-  - PLATFORM=trevorj/salty-whales:xenial MYSQL_VERSION='5.7' SUITE=single_fernet
-  - PLATFORM=trevorj/salty-whales:xenial MYSQL_VERSION='5.7' SUITE=under-apache
+#  - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-trusty-salt-2016.3 MYSQL_VERSION='5.5' SUITE=single
+#  - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-trusty-salt-2016.3 MYSQL_VERSION='5.5' SUITE=single_domain
+#  - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-trusty-salt-2016.3 MYSQL_VERSION='5.5' SUITE=single_fernet
+#  - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-trusty-salt-2016.3 MYSQL_VERSION='5.5' SUITE=under-apache
+  - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 MYSQL_VERSION='5.7' SUITE=single
+  - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 MYSQL_VERSION='5.7' SUITE=single_domain
+  - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 MYSQL_VERSION='5.7' SUITE=single_fernet
+  - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-xenial-salt-2017.7 MYSQL_VERSION='5.7' SUITE=under-apache
+#  - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 MYSQL_VERSION='5.7' SUITE=single
+#  - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 MYSQL_VERSION='5.7' SUITE=single_domain
+#  - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 MYSQL_VERSION='5.7' SUITE=single_fernet
+#  - PLATFORM=epcim/salt-formulas:saltstack-ubuntu-bionic-salt-2017.7 MYSQL_VERSION='5.7' SUITE=under-apache
 
 before_script:
   - set -o pipefail
