@@ -54,6 +54,12 @@ minion:
       {%- endif %}
     {%- endfor %}
   {%- endif %}
+dependency:
+  {% from "keystone/map.jinja" import server,client with context %}
+  {%- if client.get('enabled', False) or server.get('enabled', False) %}
+  engine: pkg
+  pkgs: {{ client.pkgs }}
+  {%- endif %}
 
 {#-
 vim: syntax=jinja
