@@ -39,10 +39,14 @@ keystone:
           enabled: false
     domain:
       testing:
-        description: "Testing domain"
+        description: "Test domain"
         backend: ldap
+        identity:
+          backend: ldap
+          driver: ldap
         assignment:
           backend: sql
+          driver: keystone.assignment.backends.sql.Assignment
         ldap:
           url: "ldaps://idm.domain.com"
           suffix: "dc=cloud,dc=domain,dc=com"

@@ -214,6 +214,26 @@ Keystone domain with LDAP backend, using SQL for role/project assignment
               uid: keystone
               password: password
 
+Use driver aliases for drivers instead of class path's
+
+.. code-block:: yaml
+
+    keystone:
+      server:
+        domain:
+          test:
+            description: "Test domain"
+            backend: ldap
+            assignment:
+              backend: sql
+              driver: sql
+            identity:
+              backend: ldap
+              driver: keystone.identity.backends.ldap.Identity
+            ldap:
+              url: "ldaps://idm.domain.com"
+              ...
+
 Using LDAP backend for default domain
 
 .. code-block:: yaml
