@@ -66,6 +66,9 @@
         'pkgs': ['python-keystoneclient', 'python-openstackclient'],
         'service': 'keystone',
         'roles': ['admin', 'Member'],
+        'os_client_config': {
+            'pkgs': ['python-os-client-config'],
+        },
     },
     'RedHat': {
         'pkgs': ['python-keystoneclient'],

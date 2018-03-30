@@ -706,6 +706,29 @@ Configuration of policy.json file
         policy:
           admin_or_token_subject: 'rule:admin_required or rule:token_subject'
 
+Manage os-cloud-config yml with keystone.client
+
+.. code-block:: yaml
+
+    keystone:
+      client:
+        os_client_config:
+          enabled: true
+          cfgs:
+            root:
+              file: /root/.config/openstack/clouds.yml
+              content:
+                clouds:
+                  admin_identity:
+                    region_name: RegioneOne
+                    auth:
+                      username: admin
+                      password: secretpassword
+                      user_domain_name: Default
+                      project_name: admin
+                      project_domain_name: Default
+                      auth_url: "http://1.2.3.4:5000"
+
 Setting up default admin project name and domain
 
 .. code-block:: yaml
