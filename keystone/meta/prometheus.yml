@@ -1,7 +1,16 @@
 {%- if pillar.keystone.server is defined and pillar.keystone.server.get('enabled') %}
 {%- from "keystone/map.jinja" import monitoring with context %}
-{% raw %}
 server:
+  target:
+    dns:
+      enabled: true
+      endpoint:
+        - name: 'remote_agent_openstack'
+          domain:
+          - 'tasks.monitoring_remote_agent'
+          type: A
+          port: '{{ monitoring.output_openstack_port }}'
+{% raw %}
   alert:
     KeystoneAPIDown:
       if: >-

@@ -1,9 +1,12 @@
 {%- from "keystone/map.jinja" import monitoring, server with context %}
 {%- if server is defined and server.get('enabled', False) %}
+{%- set openstack_input_interval = monitoring.telegraf_openstack_input_plugin_interval %}
+{%- set openstack_output_expiration_interval = monitoring.telegraf_openstack_output_plugin_expiration_interval %}
+
 remote_agent:
   input:
     openstack:
-      interval: "{{ monitoring.telegraf_openstack_input_plugin_interval }}"
+      interval: "{{ openstack_input_interval }}"
       project: "{{ server.admin_tenant }}"
       tenant: "{{ server.admin_tenant }}"
       region: "{{ server.region }}"
@@ -11,6 +14,19 @@ remote_agent:
       password: "{{ server.admin_password }}"
       identity_endpoint: "{{ server.bind.private_protocol }}://{{ server.bind.private_address|replace('0.0.0.0', '127.0.0.1') }}:{{ server.bind.private_port }}/v{% if server.get('api_version', 2)|int == 2 %}2.0{% else %}3{% endif %}"
       monitor_agents: "true"
+  output:
+    prometheus_client_openstack:
+      template: telegraf/files/output/prometheus_client.conf
+      engine: prometheus
+      # Output plugin configuration
+      bind:
+        address: 0.0.0.0
+        port: "{{ monitoring.output_openstack_port }}"
+      expiration_interval: "{{ openstack_output_expiration_interval }}"
+      # Measurement filtering
+      namepass: ["openstack*"]
+    prometheus_client:
+      namedrop: ["openstack*"]
 agent:
   input:
     http_response:
