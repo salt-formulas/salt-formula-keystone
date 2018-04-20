@@ -4,6 +4,10 @@
 keystone_packages:
   pkg.installed:
   - names: {{ server.pkgs }}
+  {%- if server.service_name in ['apache2', 'httpd'] %}
+  - require_in:
+    - pkg: apache_packages
+  {%- endif %}
 
 {%- set ldap = {'enabled': False} %}
 {%- if server.get('backend') == 'ldap' %}
@@ -22,6 +26,10 @@ keystone_ldap_packages:
   - names:
     - python-ldap
     - python-ldappool
+  {%- if server.service_name in ['apache2', 'httpd'] %}
+  - require_in:
+    - pkg: apache_packages
+  {%- endif %}
 {% endif %}
 
 {%- if server.service_name in ['apache2', 'httpd'] %}
