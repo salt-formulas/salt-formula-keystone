@@ -216,10 +216,23 @@ keystone_domain_{{ domain_name }}_cacert:
 
 {%- endif %}
 
+{#- can't use RC file here as identity endpoint may not be present in keystone #}
+{#- as we will add it later in keystone.client state. Use endpoint override here. #}
+{#- will be fixed when switched to keystone bootstrap. #}
+{#- TODO: move domain creation to keystone.client state. #}
 keystone_domain_{{ domain_name }}:
   cmd.run:
-    - name: source /root/keystonercv3 && openstack domain create --description "{{ domain.description }}" {{ domain_name }}
-    - unless: {% if grains.get('noservices') %}/bin/true{% else %}source /root/keystonercv3 && openstack domain list | grep " {{ domain_name }}"{% endif %}
+    - name: openstack --os-identity-api-version 3
+            --os-endpoint {{ server.bind.get('private_protocol', 'http') }}://{{ server.bind.private_address }}:{{ server.bind.private_port }}/v3
+            --os-token {{ server.service_token }}
+            --os-auth-type admin_token
+            domain create --description "{{ domain.description }}" {{ domain_name }}
+    - unless: {% if grains.get('noservices') %}/bin/true{% else %}
+            openstack --os-identity-api-version 3
+            --os-endpoint {{ server.bind.get('private_protocol', 'http') }}://{{ server.bind.private_address }}:{{ server.bind.private_port }}/v3
+            --os-token {{ server.service_token }}
+            --os-auth-type admin_token
+            domain list | grep " {{ domain_name }}"{% endif %}
     - shell: /bin/bash
     - require:
       - file: /root/keystonercv3
