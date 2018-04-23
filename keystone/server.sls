@@ -232,7 +232,7 @@ keystone_domain_{{ domain_name }}:
             --os-endpoint {{ server.bind.get('private_protocol', 'http') }}://{{ server.bind.private_address }}:{{ server.bind.private_port }}/v3
             --os-token {{ server.service_token }}
             --os-auth-type admin_token
-            domain list | grep " {{ domain_name }}"{% endif %}
+            domain show "{{ domain_name }}"{% endif %}
     - shell: /bin/bash
     - require:
       - file: /root/keystonercv3
