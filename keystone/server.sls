@@ -354,6 +354,23 @@ keystone_credential_setup:
 {%- endif %}
 {%- endif %}
 
+{%- if server.version not in ['mitaka', 'newton', 'ocata', 'pike'] %}
+{%- if not grains.get('noservices', False) %}
+keystone_identity_bootstrap_setup:
+  cmd.run:
+  - name: keystone-manage bootstrap
+          --bootstrap-password {{ server.admin_password }}
+          --bootstrap-username {{ server.admin_name }}
+          --bootstrap-project-name admin
+          --bootstrap-role-name admin
+          --bootstrap-service-name keystone
+          --bootstrap-region-id {{ server.get('admin_region', 'RegionOne') }}
+          --bootstrap-internal-url {{ server.bind.get('protocol', 'http') }}://{{ server.bind.address }}:{{ server.bind.get('port', 5000) }}
+  - unless:
+      . /root/keystonercv3; openstack endpoint list --service identity --interface internal -f value -c URL  |grep {{ server.bind.get('port', 5000) }}
+{%- endif %}
+{%- endif %}
+
 {%- if not grains.get('noservices', False) %}
 
 {%- if not salt['pillar.get']('linux:system:repo:mirantis_openstack', False) %}

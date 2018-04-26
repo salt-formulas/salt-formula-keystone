@@ -1,5 +1,7 @@
 {%- from "keystone/map.jinja" import client with context %}
-{%- if client.enabled %}
+{# this legacy client is deprecated and will be removed when pike is EOL #}
+{# it is not recommended to use it for v3 API #}
+{%- if client.enabled and not client.get('resources', {}).get('v3', {}).get('enabled', False) %}
 
 {%- for server_name, server in client.get('server', {}).items() %}
 
