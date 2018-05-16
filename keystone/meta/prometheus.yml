@@ -10,30 +10,53 @@ server:
           - 'tasks.monitoring_remote_agent'
           type: A
           port: '{{ monitoring.output_openstack_port }}'
+{%- set major_threshold = monitoring.endpoint_failed_major_threshold|float %}
 {% raw %}
   alert:
-    KeystoneAPIDown:
+    KeystoneAPIOutage:
       if: >-
-        openstack_api_check_status{service=~"keystone.*"} == 0
-      for: 2m
+        openstack_api_check_status{name=~"keystone.*"} == 0
       labels:
-        severity: down
-        service: "{{ $labels.service }}"
+        severity: critical
+        service: keystone
       annotations:
-        summary: "Endpoint check for '{{ $labels.service }}' is down"
+        summary: "Keystone API outage"
         description: >-
-            Endpoint check for '{{ $labels.service }}' is down for 2 minutes
+          Keystone API is not accessible for the Keystone endpoint in the OpenStack service catalog.
     KeystoneAPIServiceDown:
       if: >-
-        http_response_status{service=~"keystone.*"} == 0
+        http_response_status{name=~"keystone.*"} == 0
       for: 2m
       labels:
-        severity: down
-        service: "{{ $labels.service }}"
+        severity: minor
+        service: keystone
       annotations:
-        summary: "HTTP check for '{{ $labels.service }}' down"
+        summary: "Host {{ $labels.name }} endpoint is not accessible"
         description: >-
-            The HTTP check for '{{ $labels.service }}' is down on {{ $labels.host }} for 2 minutes.
+          The host {{ $labels.name }} endpoint on the {{ $labels.host }} node is not accessible for at least 2 minutes.
+{%- endraw %}
+    KeystoneAPIServicesDownMajor:
+      if: >-
+        count(http_response_status{name=~"keystone.*"} == 0) by (name) >= count(http_response_status{name=~"keystone.*"}) by (name) * {{ major_threshold }}
+      for: 2m
+      labels:
+        severity: major
+        service: keystone
+      annotations:
+        summary: "{{major_threshold * 100}}% of host {% raw %}{{ $labels.name }} endpoints are not accessible"
+        description: >-
+          {{ $value }} host {{ $labels.name }} endpoints are not accessible for at least 2 minutes (at least {% endraw %}{{major_threshold * 100}}{% raw %}%).
+    KeystoneAPIServiceOutage:
+      if: >-
+        count(http_response_status{name=~"keystone.*"} == 0) by (name) == count(http_response_status{name=~"keystone.*"}) by (name)
+      for: 2m
+      labels:
+        severity: critical
+        service: keystone
+      annotations:
+        summary: "Host {{ $labels.name }} outage"
+        description: >-
+          All available host {{ $labels.name }} endpoints are not accessible for at least 2 minutes.
     KeystoneErrorLogsTooHigh:
 {%- endraw %}
       {%- set log_threshold = monitoring.error_log_rate|float %}
@@ -42,11 +65,12 @@ server:
 {%- raw %}
       labels:
         severity: warning
-        service: "{{ $labels.service }}"
+        service: keystone
       annotations:
-        summary: 'Too many errors in {{ $labels.service }} logs'
-        description: 'The rate of errors in {{ $labels.service }} logs over the last 5 minutes is too high on node {{ $labels.host }} (current value={{ $value }}, threshold={%- endraw %}{{ log_threshold }}).'
-    KeystoneAPITooSlow:
+        summary: "High number of errors in Keystone logs"
+        description: "The average per-second rate of errors in Keystone logs on the {{ $labels.host }} node is {{ $value }} (as measured over the last 5 minutes)."
+{%- endraw %}
+    KeystoneAPIResponseTimeTooHigh:
       {%- set response_time_threshold = monitoring.http_response_time_p90|float %}
       if: >-
         max by(host) (openstack_http_response_times{service='keystone',quantile="0.9",http_method=~"^(GET|POST)$",http_status=~"^2..$"}) >= {{ response_time_threshold }}
@@ -56,7 +80,6 @@ server:
         severity: warning
         service: keystone
       annotations:
-        summary: 'Keystone API too slow'
-        description: 'The 90th percentile of the Keystone API response times for GET and POST requests is too high on node {{ $labels.host }} (current value={{ $value }}s, threshold={%- endraw %}{{ response_time_threshold }}s).'
-
+        summary: "High response time of Keystone API"
+        description: "The Keystone API response time for GET and POST requests on the {{ $labels.host }} node is higher than {% endraw %}{{response_time_threshold}}s for at least 2 minutes."
 {%- endif %}
