@@ -49,6 +49,13 @@ minion:
       keystone.auth_url: '{{ protocol+'://'+identity.admin.host+':'+identity.admin.port|string+version }}'
       keystone.region_name: '{{ identity.admin.region_name }}'
       keystone.use_keystoneauth: {{ identity.admin.get('use_keystoneauth', false) }}
+      {%- if identity.admin.user_domain_name is defined %}
+      keystone.user_domain_name: '{{ identity.admin.user_domain_name }}'
+      {%- endif %}
+      keystone.project_name: '{{ identity.admin.project }}'
+      {%- if identity.admin.project_domain_name is defined %}
+      keystone.project_domain_name: '{{ identity.admin.project_domain_name }}'
+      {%- endif %}
 
         {%- endif %}
       {%- endif %}
