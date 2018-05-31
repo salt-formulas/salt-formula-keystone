@@ -164,6 +164,11 @@ notification_format = {{ server.get("notification_format", "basic") }}
 {%- include "oslo_templates/files/queens/oslo/_log.conf" %}
 {%- endif %}
 
+{%- if server.notification %}
+{%- set _data = server.message_queue %}
+{%- include "oslo_templates/files/queens/oslo/messaging/_default.conf" %}
+{%- endif %}
+
 [application_credential]
 
 #
