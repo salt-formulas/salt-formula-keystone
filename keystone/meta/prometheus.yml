@@ -13,7 +13,7 @@ server:
 {%- set major_threshold = monitoring.endpoint_failed_major_threshold|float %}
 {% raw %}
   alert:
-    KeystoneAPIOutage:
+    KeystoneApiOutage:
       if: >-
         openstack_api_check_status{name=~"keystone.*"} == 0
       labels:
@@ -23,7 +23,7 @@ server:
         summary: "Keystone API outage"
         description: >-
           Keystone API is not accessible for the Keystone endpoint in the OpenStack service catalog.
-    KeystoneAPIServiceDown:
+    KeystoneApiEndpointDown:
       if: >-
         http_response_status{name=~"keystone.*"} == 0
       for: 2m
@@ -31,11 +31,11 @@ server:
         severity: minor
         service: keystone
       annotations:
-        summary: "Host {{ $labels.name }} endpoint is not accessible"
+        summary: "{{ $labels.name }} endpoint is not accessible"
         description: >-
-          The host {{ $labels.name }} endpoint on the {{ $labels.host }} node is not accessible for at least 2 minutes.
+          The {{ $labels.name }} endpoint on the {{ $labels.host }} node is not accessible for 2 minutes.
 {%- endraw %}
-    KeystoneAPIServicesDownMajor:
+    KeystoneApiEndpointssDownMajor:
       if: >-
         count(http_response_status{name=~"keystone.*"} == 0) by (name) >= count(http_response_status{name=~"keystone.*"}) by (name) * {{ major_threshold }}
       for: 2m
@@ -43,10 +43,10 @@ server:
         severity: major
         service: keystone
       annotations:
-        summary: "{{major_threshold * 100}}% of host {% raw %}{{ $labels.name }} endpoints are not accessible"
+        summary: "{{major_threshold * 100}}{% raw %}% of {{ $labels.name }} endpoints are not accessible"
         description: >-
-          {{ $value }} host {{ $labels.name }} endpoints are not accessible for at least 2 minutes (at least {% endraw %}{{major_threshold * 100}}{% raw %}%).
-    KeystoneAPIServiceOutage:
+          {{ $value }} {{ $labels.name }} endpoints (>= {% endraw %}{{major_threshold * 100}}{% raw %}%) are not accessible for 2 minutes.
+    KeystoneApiEndpointsOutage:
       if: >-
         count(http_response_status{name=~"keystone.*"} == 0) by (name) == count(http_response_status{name=~"keystone.*"}) by (name)
       for: 2m
@@ -54,9 +54,9 @@ server:
         severity: critical
         service: keystone
       annotations:
-        summary: "Host {{ $labels.name }} outage"
+        summary: "{{ $labels.name }} endpoints outage"
         description: >-
-          All available host {{ $labels.name }} endpoints are not accessible for at least 2 minutes.
+          All available {{ $labels.name }} endpoints are not accessible for 2 minutes.
     KeystoneErrorLogsTooHigh:
 {%- endraw %}
       {%- set log_threshold = monitoring.error_log_rate|float %}
@@ -70,7 +70,7 @@ server:
         summary: "High number of errors in Keystone logs"
         description: "The average per-second rate of errors in Keystone logs on the {{ $labels.host }} node is {{ $value }} (as measured over the last 5 minutes)."
 {%- endraw %}
-    KeystoneAPIResponseTimeTooHigh:
+    KeystoneApiResponseTimeTooHigh:
       {%- set response_time_threshold = monitoring.http_response_time_p90|float %}
       if: >-
         max by(host) (openstack_http_response_times{service='keystone',quantile="0.9",http_method=~"^(GET|POST)$",http_status=~"^2..$"}) >= {{ response_time_threshold }}
@@ -81,5 +81,5 @@ server:
         service: keystone
       annotations:
         summary: "High response time of Keystone API"
-        description: "The Keystone API response time for GET and POST requests on the {{ $labels.host }} node is higher than {% endraw %}{{response_time_threshold}}s for at least 2 minutes."
+        description: "The Keystone API response time for GET and POST requests on the {{ $labels.host }} node is higher than {% endraw %}{{response_time_threshold}}s for 2 minutes."
 {%- endif %}
