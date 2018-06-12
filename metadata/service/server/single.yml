@@ -20,6 +20,7 @@ parameters:
       admin_email: root@localhost
       bind:
         address: 0.0.0.0
+        protocol: ${_param:keystone_service_protocol}
         private_address: ${_param:keystone_service_host}
         private_port: 35357
         private_protocol: ${_param:keystone_service_protocol}
