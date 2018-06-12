@@ -20,6 +20,7 @@ parameters:
       admin_email: root@domain.com
       bind:
         address: ${_param:cluster_local_address}
+        protocol: ${_param:cluster_internal_protocol}
         private_address: ${_param:cluster_vip_address}
         private_port: 35357
         private_protocol: ${_param:cluster_internal_protocol}
