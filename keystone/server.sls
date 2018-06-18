@@ -331,6 +331,31 @@ keystone_fernet_setup:
   - onlyif: /bin/false
     {%- endif %}
 
+  {% if server.tokens.get('fernet_rotation_driver', 'shared_filesystem') == 'rsync' %}
+    {% if server.get('role', 'secondary') == 'primary' %}
+/var/lib/keystone/fernet_keys_rotate.sh:
+  file.managed:
+  - source: salt://keystone/files/fernet_keys_rotate.sh
+  - template: jinja
+  - user: keystone
+  - group: keystone
+  - mode: 744
+  - require:
+    - pkg: keystone_packages
+    - file: keystone_fernet_keys
+    - cmd: keystone_fernet_setup
+
+run_fernet_rotation_script_in_sync_mode:
+  cmd.run:
+    - name: /var/lib/keystone/fernet_keys_rotate.sh -s
+    - runas: keystone
+    - require:
+      - pkg: keystone_packages
+      - file: /var/lib/keystone/fernet_keys_rotate.sh
+
+    {%- endif %}
+  {%- endif %}
+
 {% endif %}
 
 {%- if server.version in ['newton', 'ocata', 'pike'] %}

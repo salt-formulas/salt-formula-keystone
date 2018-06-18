@@ -7,6 +7,12 @@ orchestrate:
   control:
     priority: 520
 
+orchestration:
+  deploy:
+    applications:
+      keystone:
+        priority: 1000
+
 minion:
   {%- if pillar.get('keystone', {}).get('server') or pillar.get('keystone', {}).get('client') %}
     {%- from "keystone/map.jinja" import server with context %}

@@ -811,6 +811,40 @@ Usage
 #. Apply the :command:`keystone.client` state.
 
 
+Fernet-keys rotation without gluster
+------------------------------------
+
+In the future fernet keys supposed to be rotated with rsync+ssh instead of using glusterfs. By default it is assumed
+that the script will run on primary control node (ctl01) and will rotate and transfer fernet keys to secondary
+controller nodes (ctl02, ctl03). Following parameter should be set on cluster level:
+
+keystone_node_role
+
+and fernet_rotation_driver should be set to 'rsync'
+
+By default this parameter is set to "secondary" on system level along with other parameters:
+.. code-block:: yaml
+
+  keystone:
+    server:
+      role: ${_param:keystone_node_role}
+    tokens:
+      fernet_sync_nodes_list:
+        control02:
+          name: ctl02
+          enabled: True
+        control03:
+          name: ctl03
+          enabled: True
+      fernet_rotation_driver: rsync
+
+Prior to running keystone salt states ssh key should be generated and its public part should be placed on secondary controllers.
+It can be accomplished by running following orchestration state before keystone states:
+
+salt-run state.orchestrate keystone.orchestrate.deploy
+
+Currently the default fernet rotation driver is a shared filesystem
+
 Documentation and Bugs
 ======================
 
