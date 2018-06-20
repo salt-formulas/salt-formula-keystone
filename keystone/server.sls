@@ -163,7 +163,7 @@ keystone_fluentd_logger_package:
 
 {%- if rule != None %}
 
-rule_{{ name }}_present:
+keystone_rule_{{ name }}_present:
   keystone_policy.rule_present:
   - path: /etc/keystone/policy.json
   - name: {{ name }}
@@ -175,7 +175,7 @@ rule_{{ name }}_present:
 
 {%- else %}
 
-rule_{{ name }}_absent:
+keystone_rule_{{ name }}_absent:
   keystone_policy.rule_absent:
   - path: /etc/keystone/policy.json
   - name: {{ name }}
