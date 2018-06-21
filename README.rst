@@ -272,6 +272,23 @@ Using LDAP backend for default domain with "user_enabled" field emulation
           user_enabled_emulation_dn: "cn=os-user-enabled,ou=Openstack,o=domain.com"
           user_enabled_emulation_use_group_config: True
 
+If the members of the group objectclass are user IDs rather than DNs, set  group_members_are_ids to true. This is the case when using posixGroup as the group objectclass and OpenDirectory.
+
+.. code-block:: yaml
+
+    keystone:
+      server:
+        backend: ldap
+        assignment:
+          backend: sql
+        ldap:
+          url: "ldaps://idm.domain.com"
+          suffix: "dc=cloud,dc=domain,dc=com"
+          # Will bind as uid=keystone,cn=users,cn=accounts,dc=cloud,dc=domain,dc=com
+          uid: keystone
+          password: password
+          group_members_are_ids: True
+
 Simple service endpoint definition (defaults to RegionOne)
 
 .. code-block:: yaml
