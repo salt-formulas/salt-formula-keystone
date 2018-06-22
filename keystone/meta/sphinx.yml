@@ -23,8 +23,9 @@ doc:
           address: http://{{ server.bind.address }}:{{ server.bind.public_port }}
           protocol: http
       param:
-        bind:
+        private_bind:
           value: {{ server.bind.address }}:{{ server.bind.private_port }}
+        bind:
           value: {{ server.bind.address }}:{{ server.bind.public_port }}
         token_engine:
           value: {{ server.tokens.engine }}
