@@ -129,10 +129,11 @@ keystone_fluentd_logger_package:
   file.managed:
     - user: keystone
     - group: keystone
-    - source: salt://keystone/files/logging.conf
+    - source: salt://oslo_templates/files/logging/_logging.conf
     - template: jinja
     - defaults:
-        values: {{ server }}
+        service_name: keystone
+        _data: {{ server.logging }}
     - require:
       - pkg: keystone_packages
 {%- if server.logging.log_handlers.get('fluentd', {}).get('enabled', False) %}
