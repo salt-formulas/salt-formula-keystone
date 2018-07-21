@@ -246,6 +246,9 @@ keystone_domain_{{ domain_name }}:
     - require:
       - file: /root/keystonercv3
       - service: {{ keystone_service }}
+      {%- if not grains.get('noservices', False) %}
+      - cmd: keystone_syncdb
+      {%- endif %}
 
 {%- endfor %}
 
