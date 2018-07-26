@@ -61,7 +61,7 @@
           },
         },
     },
-}, merge=pillar.keystone.get('server', {}), base='BaseDefaults') %}
+}, merge=pillar.get('keystone', {}).get('server', {}), base='BaseDefaults') %}
 
 {% set client = salt['grains.filter_by']({
     'Debian': {
@@ -76,7 +76,7 @@
         'pkgs': ['python-keystoneclient'],
         'roles': ['admin', 'Member'],
     },
-}, merge=pillar.keystone.get('client', {})) %}
+}, merge=pillar.get('keystone', {}).get('client', {})) %}
 
 {% set control = salt['grains.filter_by']({
     'Debian': {
@@ -85,7 +85,7 @@
     'RedHat': {
         'pkgs': [],
     },
-}, merge=pillar.keystone.get('control', {})) %}
+}, merge=pillar.get('keystone', {}).get('control', {})) %}
 
 {% set monitoring = salt['grains.filter_by']({
     'default': {
