@@ -1,6 +1,6 @@
-==================
-OpenStack Keystone
-==================
+=====
+Usage
+=====
 
 Keystone provides authentication, authorization and service discovery
 mechanisms via HTTP primarily for use by projects in the OpenStack family. It
@@ -11,12 +11,11 @@ From Kilo release Keystone v3 endpoint has definition without version in url
 
 .. code-block:: bash
 
-  +----------------------------------+-----------+--------------------------+--------------------------+---------------------------+----------------------------------+
-  |                id                |   region  |        publicurl         |       internalurl        |          adminurl         |            service_id            |
-  +----------------------------------+-----------+--------------------------+--------------------------+---------------------------+----------------------------------+
-  | 91663a8db11c487c9253c8c456863494 | RegionOne | http://10.0.150.37:5000/ | http://10.0.150.37:5000/ | http://10.0.150.37:35357/ | 0fd2dba3153d45a1ba7f709cfc2d69c9 |
-  +----------------------------------+-----------+--------------------------+--------------------------+---------------------------+----------------------------------+
-
+  +----------------+-----------+--------------------------+--------------------------+---------------------------+---------------+
+  |       id       |   region  |        publicurl         |       internalurl        |          adminurl         |   service_id  |
+  +----------------+-----------+--------------------------+--------------------------+---------------------------+---------------+
+  | 91663a8d...494 | RegionOne | http://10.0.150.37:5000/ | http://10.0.150.37:5000/ | http://10.0.150.37:35357/ | 0fd2dba...9c9 |
+  +----------------+-----------+--------------------------+--------------------------+---------------------------+---------------+
 
 Sample pillars
 ==============
@@ -27,7 +26,7 @@ Sample pillars
     atabase:host), sqlalchemy will try to connect to /var/run/mysql/
     mysqld.sock, may cause issues if you located your mysql socket elsewhere
 
-Full stacked keystone
+Full stacked Keystone:
 
 .. code-block:: yaml
 
@@ -61,7 +60,7 @@ Full stacked keystone
           password: 'LfTno5mYdZmRfoPV'
           user: 'keystone'
 
-Keystone public HTTPS API
+Keystone public HTTPS API:
 
 .. code-block:: yaml
 
@@ -86,7 +85,10 @@ Keystone public HTTPS API
             admin_address: 10.0.0.20
             admin_port: 8774
 
-Keystone with custom policies. Keys with specified rules are created or set to this value if they already exists. Keys with no value (like our "existing_rule") are deleted from the policy file.
+Keystone with custom policies. Keys with specified rules
+are created or set to this value if they already exists.
+Keys with no value (like our ``existing_rule``) are deleted
+from the policy file:
 
 .. code-block:: yaml
 
@@ -97,7 +99,7 @@ Keystone with custom policies. Keys with specified rules are created or set to t
           new_rule: "rule:admin_required"
           existing_rule:
 
-Keystone memcached storage for tokens
+Keystone memcached storage for tokens:
 
 .. code-block:: yaml
 
@@ -114,7 +116,7 @@ Keystone memcached storage for tokens
         services:
         ...
 
-Keystone clustered memcached storage for tokens
+Keystone clustered memcached storage for tokens:
 
 .. code-block:: yaml
 
@@ -134,7 +136,7 @@ Keystone clustered memcached storage for tokens
         services:
         ...
 
-Keystone client
+Keystone client:
 
 .. code-block:: yaml
 
@@ -169,7 +171,7 @@ Keystone cluster
             name: admin
             password: password
 
-Keystone fernet tokens for OpenStack Kilo release
+Keystone fernet tokens for OpenStack Kilo release:
 
 .. code-block:: yaml
 
@@ -181,7 +183,7 @@ Keystone fernet tokens for OpenStack Kilo release
           max_active_keys: 3
         ...
 
-Keystone auth methods
+Keystone auth methods:
 
 .. code-block:: yaml
 
@@ -195,7 +197,8 @@ Keystone auth methods
         - oauth1
         ...
 
-Keystone domain with LDAP backend, using SQL for role/project assignment
+Keystone domain with LDAP backend, using SQL for
+role/project assignment:
 
 .. code-block:: yaml
 
@@ -214,7 +217,7 @@ Keystone domain with LDAP backend, using SQL for role/project assignment
               uid: keystone
               password: password
 
-Use driver aliases for drivers instead of class path's
+Use driver aliases for drivers instead of class path's:
 
 .. code-block:: yaml
 
@@ -234,7 +237,7 @@ Use driver aliases for drivers instead of class path's
               url: "ldaps://idm.domain.com"
               ...
 
-Using LDAP backend for default domain
+Using LDAP backend for default domain:
 
 .. code-block:: yaml
 
@@ -250,7 +253,8 @@ Using LDAP backend for default domain
           uid: keystone
           password: password
 
-Using LDAP backend for default domain with "user_enabled" field emulation
+Using LDAP backend for default domain with
+``user_enabled`` field emulation:
 
 .. code-block:: yaml
 
@@ -272,7 +276,10 @@ Using LDAP backend for default domain with "user_enabled" field emulation
           user_enabled_emulation_dn: "cn=os-user-enabled,ou=Openstack,o=domain.com"
           user_enabled_emulation_use_group_config: True
 
-If the members of the group objectclass are user IDs rather than DNs, set  group_members_are_ids to true. This is the case when using posixGroup as the group objectclass and OpenDirectory.
+If the members of the group ``objectclass`` are user IDs
+rather than DNs, set ``group_members_are_ids`` to ``true``.
+This is the case when using ``posixGroup` as the group
+``objectclass`` and ``OpenDirectory``:
 
 .. code-block:: yaml
 
@@ -289,7 +296,7 @@ If the members of the group objectclass are user IDs rather than DNs, set  group
           password: password
           group_members_are_ids: True
 
-Simple service endpoint definition (defaults to RegionOne)
+Simple service endpoint definition (defaults to ``RegionOne``):
 
 .. code-block:: yaml
 
@@ -305,7 +312,7 @@ Simple service endpoint definition (defaults to RegionOne)
             bind:
               ...
 
-Region-aware service endpoints definition
+Region-aware service endpoints definition:
 
 .. code-block:: yaml
 
@@ -330,7 +337,7 @@ Region-aware service endpoints definition
             bind:
               ...
 
-Enable ceilometer notifications
+Enable Ceilometer notifications:
 
 .. code-block:: yaml
 
@@ -346,7 +353,7 @@ Enable ceilometer notifications
           virtual_host: '/openstack'
           ha_queues: true
 
-Client-side RabbitMQ HA setup
+Client-side RabbitMQ HA setup:
 
 .. code-block:: yaml
 
@@ -368,7 +375,8 @@ Client-side RabbitMQ TLS configuration:
 
 |
 
-By default system-wide CA certs are used. Nothing should be specified except `ssl.enabled`.
+By default system-wide CA certs are used. Nothing should be
+specified except ``ssl.enabled``.
 
 .. code-block:: yaml
 
@@ -379,7 +387,8 @@ By default system-wide CA certs are used. Nothing should be specified except `ss
         ssl:
           enabled: True
 
-Use `cacert_file` option to specify the CA-cert file path explicitly:
+Use ``cacert_file`` option to specify the CA-cert
+file path explicitly:
 
 .. code-block:: yaml
 
@@ -391,7 +400,8 @@ Use `cacert_file` option to specify the CA-cert file path explicitly:
           enabled: True
           cacert_file: /etc/ssl/rabbitmq-ca.pem
 
-To manage content of the `cacert_file` use the `cacert` option:
+To manage content of the ``cacert_file`` use the ``cacert``
+option:
 
 .. code-block:: yaml
 
@@ -409,12 +419,15 @@ To manage content of the `cacert_file` use the `cacert` option:
 
           cacert_file: /etc/openstack/rabbitmq-ca.pem
 
+.. note::
 
-Notice:
- * The `message_queue.port` is set to **5671** (AMQPS) by default if `ssl.enabled=True`.
- * Use `message_queue.ssl.version` if you need to specify protocol version. By default is TLSv1 for python < 2.7.9 and TLSv1_2 for version above.
+   * The ``message_queue.port`` is set to ``5671`` (AMQPS) by
+     default if ``ssl.enabled=True``.
+   * Use ``message_queue.ssl.version`` if you need to specify
+     protocol version. By default, is ``TLSv1`` for python <
+     2.7.9 and ``TLSv1_2`` for version above.
 
-Enable CADF audit notification
+Enable CADF audit notification:
 
 .. code-block:: yaml
 
@@ -423,7 +436,7 @@ Enable CADF audit notification
         notification: true
         notification_format: cadf
 
-Run keystone under Apache
+Run Keystone under Apache:
 
 .. code-block:: yaml
 
@@ -444,7 +457,7 @@ Run keystone under Apache
         modules:
           - wsgi
 
-Enable SAML2 Federated keystone
+Enable SAML2 Federated keystone:
 
 .. code-block:: yaml
 
@@ -473,7 +486,7 @@ Enable SAML2 Federated keystone
           - wsgi
           - shib2
 
-Enable OIDC Federated keystone
+Enable OIDC Federated Keystone:
 
 .. code-block:: yaml
 
@@ -513,9 +526,11 @@ Enable OIDC Federated keystone
           - wsgi
           - auth_openidc
 
-Notes: Ubuntu Trusty repository doesn't contain libapache2-mod-auth-openidc package. Additonal repository should be added to source list.
+.. note:: Ubuntu Trusty repository doesn't contain
+          ``libapache2-mod-auth-openidc`` package. Additonal
+          repository should be added to the source list.
 
-Use a custom identity driver with custom options
+Use a custom identity driver with custom options:
 
 .. code-block:: yaml
 
@@ -533,7 +548,7 @@ Use a custom identity driver with custom options
           caching: true
           cache_time: 600
 
-Enable CORS parameters
+Enable CORS parameters:
 
 .. code-block:: yaml
 
@@ -547,12 +562,10 @@ Enable CORS parameters
           allow_credentials: True
           max_age: 86400
 
-
-
 Keystone client
 ---------------
 
-Service endpoints enforcement with service token
+Service endpoints enforcement with service token:
 
 .. code-block:: yaml
 
@@ -581,7 +594,7 @@ Service endpoints enforcement with service token
                   admin_port: 8773
                   admin_path: '/v2'
 
-Project, users, roles enforcement with admin user
+Project, users, roles enforcement with admin user:
 
 .. code-block:: yaml
 
@@ -630,7 +643,7 @@ Project, users, roles enforcement with admin user
                     roles:
                     - custom-roles
 
-Multiple servers example
+Multiple servers example:
 
 .. code-block:: yaml
 
@@ -656,8 +669,7 @@ Multiple servers example
               password: 'workshop'
               region_name: RegionOne
 
-
-Tenant quotas
+Tenant quotas:
 
 .. code-block:: yaml
 
@@ -696,7 +708,8 @@ Tenant quotas
                   server_groups: 20
                   server_group_members: 20
 
-Extra config params in keystone.conf (since Mitaka release)
+Extra config params in ``keystone.conf``
+(since Mitaka release):
 
 .. code-block:: yaml
 
@@ -712,10 +725,9 @@ Extra config params in keystone.conf (since Mitaka release)
             param2: value
         ....
 
-Configuration of policy.json file
+Configuration of ``policy.json`` file:
 
 .. code-block:: yaml
-
 
     keystone:
       server:
@@ -723,7 +735,7 @@ Configuration of policy.json file
         policy:
           admin_or_token_subject: 'rule:admin_required or rule:token_subject'
 
-Manage os-cloud-config yml with keystone.client
+Manage ``os-cloud-config`` yml with ``keystone.client``:
 
 .. code-block:: yaml
 
@@ -746,10 +758,9 @@ Manage os-cloud-config yml with keystone.client
                       project_domain_name: Default
                       auth_url: "http://1.2.3.4:5000"
 
-Setting up default admin project name and domain
+Setting up default admin project name and domain:
 
 .. code-block:: yaml
-
 
     keystone:
       server:
@@ -764,13 +775,20 @@ Enhanced logging with logging.conf
 By default logging.conf is disabled.
 
 That is possible to enable per-binary logging.conf with new variables:
-  * openstack_log_appender - set it to true to enable log_config_append for all OpenStack services;
-  * openstack_fluentd_handler_enabled - set to true to enable FluentHandler for all Openstack services.
-  * openstack_ossyslog_handler_enabled - set to true to enable OSSysLogHandler for all Openstack services.
 
-Only WatchedFileHandler, OSSysLogHandler and FluentHandler are available.
+* ``openstack_log_appender``
+   Set to true to enable ``log_config_append`` for all OpenStack services
 
-Also it is possible to configure this with pillar:
+* ``openstack_fluentd_handler_enabled``
+   Set to true to enable ``FluentHandler`` for all Openstack services
+
+* ``openstack_ossyslog_handler_enabled``
+   Set to true to enable ``OSSysLogHandler`` for all Openstack services
+
+Only ``WatchedFileHandler``, ``OSSysLogHandler``, and ``FluentHandler``
+are available.
+
+Also, it is possible to configure this with pillar:
 
 .. code-block:: yaml
 
@@ -789,7 +807,8 @@ Also it is possible to configure this with pillar:
 Usage
 =====
 
-Apply state `keystone.client.service` first and then `keystone.client` state.
+#. Apply the :command:`keystone.client.service` state.
+#. Apply the :command:`keystone.client` state.
 
 
 Documentation and Bugs
@@ -821,32 +840,26 @@ Developers should also join the discussion on the IRC list, at:
 Documentation and Bugs
 ======================
 
-To learn how to install and update salt-formulas, consult the documentation
-available online at:
+* http://salt-formulas.readthedocs.io/
+   Learn how to install and update salt-formulas
 
-    http://salt-formulas.readthedocs.io/
+* https://github.com/salt-formulas/salt-formula-keystone/issues
+   In the unfortunate event that bugs are discovered, report the issue to the
+   appropriate issue tracker. Use the Github issue tracker for a specific salt
+   formula
 
-In the unfortunate event that bugs are discovered, they should be reported to
-the appropriate issue tracker. Use Github issue tracker for specific salt
-formula:
+* https://launchpad.net/salt-formulas
+   For feature requests, bug reports, or blueprints affecting the entire
+   ecosystem, use the Launchpad salt-formulas project
 
-    https://github.com/salt-formulas/salt-formula-keystone/issues
+* https://launchpad.net/~salt-formulas-users
+   Join the salt-formulas-users team and subscribe to mailing list if required
 
-For feature requests, bug reports or blueprints affecting entire ecosystem,
-use Launchpad salt-formulas project:
+* https://github.com/salt-formulas/salt-formula-keystone
+   Develop the salt-formulas projects in the master branch and then submit pull
+   requests against a specific formula
 
-    https://launchpad.net/salt-formulas
+* #salt-formulas @ irc.freenode.net
+   Use this IRC channel in case of any questions or feedback which is always
+   welcome
 
-You can also join salt-formulas-users team and subscribe to mailing list:
-
-    https://launchpad.net/~salt-formulas-users
-
-Developers wishing to work on the salt-formulas projects should always base
-their work on master branch and submit pull request against specific formula.
-
-    https://github.com/salt-formulas/salt-formula-keystone
-
-Any questions or feedback is always welcome so feel free to join our IRC
-channel:
-
-    #salt-formulas @ irc.freenode.net
