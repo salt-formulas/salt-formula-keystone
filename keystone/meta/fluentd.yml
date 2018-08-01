@@ -29,7 +29,7 @@ agent:
               time_format: '%d/%b/%Y:%H:%M:%S %z'
               keep_time_key: false
               # Apache keystone format: https://regex101.com/r/KkL3my/1/
-              format: '/(?<hostname>[\w\.\-]+)\:(?<port>\d+)\s(-\s){0,1}(?<http_client_ip_address>[\d\.]+)\s\-\s\-\s\[(?<Timestamp>.*)\]\s(?<Payload>\"(?<http_method>[A-Z]+)\s(?<http_url>\S+)\s(?<http_version>[.\/\dHTFSP]+)\"\s(?<http_status>\d{3})\s(?<http_response_time>\d+)\s(?<http_response_size>\d+)\s\"(?<http_referer>.*)\"\s\"(?<user_agent>.*)\")/'
+              format: '/(?<hostname>[\w\.\-]+)\:(?<port>\d+)\s(?<http_x_forwarded_for_address>[\d\.]+|-)\s(?<http_client_ip_address>[\d\.]+)\s\-\s\-\s\[(?<Timestamp>.*)\]\s(?<Payload>\"(?<http_method>[A-Z]+)\s(?<http_url>\S+)\s(?<http_version>[.\/\dHTFSP]+)\"\s(?<http_status>\d{3})\s(?<http_response_time>\d+)\s(?<http_response_size>\d+)\s\"(?<http_referer>.*)\"\s\"(?<user_agent>.*)\")/'
         filter:
           add_keystone_wsgi_record_fields:
             tag: openstack.keystone
