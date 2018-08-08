@@ -13,7 +13,7 @@ provisioner:
   log_level: error
   formula: keystone
   grains:
-    noservices: False
+    noservices: True
   dependencies:
     - name: linux
       repo: git
@@ -76,8 +76,6 @@ suites:
 
   - name: single_domain
     provisioner:
-      grains:
-        noservices: True
       pillars-from-files:
         keystone.sls: tests/pillar/single_domain.sls
 
@@ -88,8 +86,6 @@ suites:
 
   - name: under-apache
     provisioner:
-      grains:
-        noservices: True
       pillars-from-files:
         keystone.sls: tests/pillar/apache_wsgi.sls
       state_top:

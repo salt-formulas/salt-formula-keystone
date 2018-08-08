@@ -1,9 +1,17 @@
 {%- from "keystone/map.jinja" import server with context %}
 {%- if server.enabled %}
 
+include:
+{%- if server.service_name in ['apache2', 'httpd'] %}
+- apache
+{%- endif %}
+- keystone.db.offline_sync
+
 keystone_packages:
   pkg.installed:
   - names: {{ server.pkgs }}
+  - require_in:
+    - sls: keystone.db.offline_sync
   {%- if server.service_name in ['apache2', 'httpd'] %}
   - require_in:
     - pkg: apache_packages
@@ -40,9 +48,6 @@ purge_not_needed_configs:
     - names: ['/etc/apache2/sites-enabled/keystone.conf', '/etc/apache2/sites-enabled/wsgi-keystone.conf']
     - watch_in:
       - service: {{ keystone_service }}
-
-include:
-- apache
 
 {%- if grains.os_family == "Debian" %}
 keystone:
@@ -246,9 +251,7 @@ keystone_domain_{{ domain_name }}:
     - require:
       - file: /root/keystonercv3
       - service: {{ keystone_service }}
-      {%- if not grains.get('noservices', False) %}
-      - cmd: keystone_syncdb
-      {%- endif %}
+      - sls: keystone.db.offline_sync
 
 {%- endfor %}
 
@@ -305,15 +308,6 @@ keystone_entrypoint:
   - require:
     - pkg: keystone_packages
 
-{%- if not grains.get('noservices', False) %}
-keystone_syncdb:
-  cmd.run:
-  - name: keystone-manage db_sync && sleep 1
-  - timeout: 120
-  - require:
-    - service: {{ keystone_service }}
-{%- endif %}
-
 {% if server.tokens.engine == 'fernet' %}
 
 keystone_fernet_keys:
@@ -327,14 +321,15 @@ keystone_fernet_keys:
   - require_in:
     - service: keystone_fernet_setup
 
-{%- if not grains.get('noservices', False) %}
 keystone_fernet_setup:
   cmd.run:
   - name: keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
   - require:
     - service: {{ keystone_service }}
     - file: keystone_fernet_keys
-{%- endif %}
+    {%- if grains.get('noservices', False) %}
+  - onlyif: /bin/false
+    {%- endif %}
 
 {% endif %}
 
@@ -348,18 +343,19 @@ keystone_credential_keys:
   - require:
     - pkg: keystone_packages
 
-{%- if not grains.get('noservices', False) %}
 keystone_credential_setup:
   cmd.run:
   - name: keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
   - require:
     - service: {{ keystone_service }}
     - file: keystone_credential_keys
-{%- endif %}
+    {%- if grains.get('noservices', False) %}
+  - onlyif: /bin/false
+    {%- endif %}
+
 {%- endif %}
 
 {%- if server.version not in ['mitaka', 'newton', 'ocata', 'pike'] %}
-{%- if not grains.get('noservices', False) %}
 keystone_identity_bootstrap_setup:
   cmd.run:
   - name: keystone-manage bootstrap
@@ -372,7 +368,9 @@ keystone_identity_bootstrap_setup:
           --bootstrap-internal-url {{ server.bind.get('protocol', 'http') }}://{{ server.bind.address }}:{{ server.bind.get('port', 5000) }}
   - unless:
       . /root/keystonercv3; openstack endpoint list --service identity --interface internal -f value -c URL  |grep {{ server.bind.get('port', 5000) }}
-{%- endif %}
+    {%- if grains.get('noservices', False) %}
+  - onlyif: /bin/false
+    {%- endif %}
 {%- endif %}
 
 {%- if not grains.get('noservices', False) %}
@@ -385,7 +383,7 @@ keystone_service_tenant:
   - connection_token: {{ server.service_token }}
   - connection_endpoint: 'http://{{ server.bind.address }}:{{ server.bind.private_port }}/v2.0'
   - require:
-    - cmd: keystone_syncdb
+    - sls: keystone.db.offline_sync
 
 keystone_admin_tenant:
   keystoneng.tenant_present:
