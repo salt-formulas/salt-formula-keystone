@@ -1,6 +1,5 @@
 import logging
 import os_client_config
-import uuid
 
 log = logging.getLogger(__name__)
 
@@ -94,38 +93,5 @@ def send(method, microversion_header=None):
             except:
                 resp = response.content
             return resp
-        return wrapped_f
-    return wrap
-
-
-def _check_uuid(val):
-    try:
-        return str(uuid.UUID(val)).replace('-', '') == val
-    except (TypeError, ValueError, AttributeError):
-        return False
-
-
-def get_by_name_or_uuid(resource_list, resp_key, arg_name):
-    def wrap(func):
-        def wrapped_f(*args, **kwargs):
-            if arg_name in kwargs:
-                ref = kwargs.pop(arg_name, None)
-                start_arg = 0
-            else:
-                start_arg = 1
-                ref = args[0]
-            cloud_name = kwargs['cloud_name']
-            if _check_uuid(ref):
-                uuid = ref
-            else:
-                # Then we have name not uuid
-                resp = resource_list(
-                    name=ref, cloud_name=cloud_name)[resp_key]
-                if len(resp) == 0:
-                    raise ResourceNotFound(resp_key, ref)
-                elif len(resp) > 1:
-                    raise MultipleResourcesFound(resp_key, ref)
-                uuid = resp[0]['id']
-            return func(uuid, *args[start_arg:], **kwargs)
         return wrapped_f
     return wrap

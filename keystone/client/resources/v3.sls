@@ -46,7 +46,7 @@ keystone_endpoint_{{ endpoint_name }}_{{ endpoint.interface }}_{{ endpoint.regio
   - url: {{ endpoint.url }}
   - interface: {{ endpoint.interface }}
   - service_id: {{ service_name }}
-  - region: {{ endpoint.region }}
+  - region_id: {{ endpoint.region }}
   - require:
     - keystone_service_{{ service_name }}_{{ service.type }}
 
@@ -61,16 +61,13 @@ keystone_project_{{ project_name }}:
   keystonev3.project_present:
   - cloud_name: {{ project.get('cloud_name', resources.cloud_name) }}
   - name: {{ project_name }}
+  - domain_id: {{ project.get('domain_id', 'default')}}
   {%- if project.is_domain is defined %}
   - is_domain: {{ project.is_domain }}
   {%- endif %}
   {%- if project.description is defined %}
   - description: {{ project.description }}
   {%- endif %}
-{# TODO unkomment when domain support is added. #}
-{#  {- if project.domain_id is defined %} #}
-{#  - domain_id: {{ project.domain_id }} #}
-{#  {%- endif %} #}
   {%- if project.enabled is defined %}
   - enabled: {{ project.enabled }}
   {%- endif %}
