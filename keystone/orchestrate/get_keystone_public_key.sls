@@ -7,7 +7,7 @@ applying_get_keystone_public_key_state:
 keystone_fernet_keys:
   file.directory:
   - name: {{ server.tokens.location }}
-  - mode: 650
+  - mode: 750
   - user: keystone
   - group: keystone
 
@@ -16,7 +16,7 @@ keystone_fernet_keys:
     - user: keystone
     - group: keystone
     - file_mode: 600
-    - dir_mode: 600
+    - dir_mode: 700
     - makedirs: True
     - recurse:
       - user
