@@ -4,9 +4,16 @@ applying_get_keystone_public_key_state:
 {% if server.tokens.get('fernet_rotation_driver', 'shared_filesystem') == 'rsync' %}
 {%- set authorized_keys = salt['mine.get']('I@keystone:server:role:primary', 'keystone_public_key', 'compound') %}
 
-keystone_fernet_keys:
+keystone_fernet_keys_dir:
   file.directory:
   - name: {{ server.tokens.location }}
+  - mode: 750
+  - user: keystone
+  - group: keystone
+
+keystone_credential_keys_dir:
+  file.directory:
+  - name: {{ server.credential.location }}
   - mode: 750
   - user: keystone
   - group: keystone

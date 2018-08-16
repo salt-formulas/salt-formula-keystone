@@ -331,34 +331,35 @@ keystone_fernet_setup:
   - onlyif: /bin/false
     {%- endif %}
 
-  {% if server.tokens.get('fernet_rotation_driver', 'shared_filesystem') == 'rsync' %}
+  {% if server.get('tokens', {}).get('fernet_rotation_driver', 'shared_filesystem') == 'rsync' or server.get('credential', {}).get('credential_rotation_driver', 'shared_filesystem') == 'rsync' %}
     {% if server.get('role', 'secondary') == 'primary' %}
-/var/lib/keystone/fernet_keys_rotate.sh:
+/var/lib/keystone/keystone_keys_rotate.sh:
   file.managed:
-  - source: salt://keystone/files/fernet_keys_rotate.sh
+  - source: salt://keystone/files/keystone_keys_rotate.sh
   - template: jinja
   - user: keystone
   - group: keystone
   - mode: 744
   - require:
     - pkg: keystone_packages
-    - file: keystone_fernet_keys
-    - cmd: keystone_fernet_setup
+    {%- endif %}
+  {%- endif %}
 
-run_fernet_rotation_script_in_sync_mode:
+  {% if server.get('tokens', {}).get('fernet_rotation_driver', 'shared_filesystem') == 'rsync' %}
+    {% if server.get('role', 'secondary') == 'primary' %}
+run_fernet_rotation_sync_only:
   cmd.run:
-    - name: /var/lib/keystone/fernet_keys_rotate.sh -s
+    - name: /var/lib/keystone/keystone_keys_rotate.sh -s -t fernet
     - runas: keystone
     - require:
-      - pkg: keystone_packages
-      - file: /var/lib/keystone/fernet_keys_rotate.sh
-
+      - cmd: keystone_fernet_setup
+      - file: /var/lib/keystone/keystone_keys_rotate.sh
     {%- endif %}
   {%- endif %}
 
 {% endif %}
 
-{%- if server.version in ['newton', 'ocata', 'pike'] %}
+{%- if server.version not in ['mitaka'] %}
 keystone_credential_keys:
   file.directory:
   - name: {{ server.credential.location }}
@@ -377,6 +378,18 @@ keystone_credential_setup:
     {%- if grains.get('noservices', False) %}
   - onlyif: /bin/false
     {%- endif %}
+
+  {% if server.get('credential', {}).get('credential_rotation_driver', 'shared_filesystem') == 'rsync' %}
+    {% if server.get('role', 'secondary') == 'primary' %}
+run_credential_rotation_sync_only:
+  cmd.run:
+    - name: /var/lib/keystone/keystone_keys_rotate.sh -s -t credential
+    - runas: keystone
+    - require:
+      - cmd: keystone_credential_setup
+      - file: /var/lib/keystone/keystone_keys_rotate.sh
+    {%- endif %}
+  {%- endif %}
 
 {%- endif %}
 
