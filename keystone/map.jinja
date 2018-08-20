@@ -67,7 +67,13 @@
     },
 }, merge=pillar.get('keystone', {}).get('server', {}), base='BaseDefaults') %}
 
+{%- set client_default_params = {
+      'enabled': false
+    }
+%}
+
 {% set client = salt['grains.filter_by']({
+    'BaseDefaults': client_default_params,
     'Debian': {
         'pkgs': ['python-keystoneclient', 'python-openstackclient'],
         'service': 'keystone',
@@ -80,7 +86,7 @@
         'pkgs': ['python-keystoneclient'],
         'roles': ['admin', 'Member'],
     },
-}, merge=pillar.get('keystone', {}).get('client', {})) %}
+}, merge=pillar.get('keystone', {}).get('client', {}), base='BaseDefaults') %}
 
 {% set control = salt['grains.filter_by']({
     'Debian': {

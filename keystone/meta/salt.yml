@@ -1,14 +1,9 @@
-orchestrate:
-  server:
-    priority: 500
-    batch: 1
-  client:
-    priority: 510
-  control:
-    priority: 520
-
 orchestration:
   deploy:
+    applications:
+      keystone:
+        priority: 1000
+  upgrade:
     applications:
       keystone:
         priority: 1000
