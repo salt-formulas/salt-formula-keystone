@@ -62,10 +62,14 @@ def endpoint_present(name, url, interface, service_id, cloud_name, **kwargs):
         return _find_failed(name, 'endpoint')
 
 
-def endpoint_absent(name, cloud_name):
+def endpoint_absent(name, service_id, interface, cloud_name):
+    service_id = _keystonev3_call(
+        'service_get_details', service_id,
+        cloud_name=cloud_name)['service']['id']
+
     endpoints = _keystonev3_call(
-        'endpoint_list', name=name, cloud_name=cloud_name
-    )['endpoints']
+        'endpoint_list', name=name, service_id=service_id, interface=interface,
+        cloud_name=cloud_name)['endpoints']
     if not endpoints:
         return _absent(name, 'endpoint')
     elif len(endpoints) == 1:
@@ -133,16 +137,36 @@ def service_present(name, type, cloud_name, **kwargs):
     return _find_failed(name, 'service')
 
 
-def project_present(name, cloud_name, **kwargs):
+def service_absent(name, cloud_name):
+    try:
+        _keystonev3_call(
+            'service_get_details', name,
+            cloud_name=cloud_name)['service']
+    except Exception as e:
+        if 'ResourceNotFound' in repr(e):
+            return _absent(name, 'service')
+        else:
+            log.error('Failed to get service {}'.format(e))
+            return _find_failed(name, 'service')
+    try:
+        _keystonev3_call('service_delete', name, cloud_name=cloud_name)
+    except Exception:
+        return _delete_failed(name, 'service')
+    return _deleted(name, 'service')
+
+
+
+def project_present(name, domain_id, cloud_name, **kwargs):
 
     projects = _keystonev3_call(
-        'project_list', name=name, cloud_name=cloud_name
+        'project_list', name=name, domain_id=domain_id, cloud_name=cloud_name
     )['projects']
 
     if not projects:
         try:
             resp = _keystonev3_call(
-                'project_create', name=name, cloud_name=cloud_name, **kwargs
+                'project_create', domain_id=domain_id, name=name,
+                cloud_name=cloud_name, **kwargs
             )
         except Exception as e:
             log.error('Keystone project create failed with {}'.format(e))
@@ -176,6 +200,24 @@ def project_present(name, cloud_name, **kwargs):
             return _no_changes(name, 'project')
     else:
         return _find_failed(name, 'project')
+
+
+def project_absent(name, cloud_name):
+    try:
+        _keystonev3_call('project_get_details',
+                         project_id=name, cloud_name=cloud_name)
+    except Exception as e:
+        if 'ResourceNotFound' in repr(e):
+            return _absent(name, 'project')
+        else:
+            log.error('Failed to get project {}'.format(e))
+            return _find_failed(name, 'project')
+    try:
+        _keystonev3_call('project_delete', project_id=name,
+                         cloud_name=cloud_name)
+    except Exception:
+        return _delete_failed(name, 'project')
+    return _deleted(name, 'project')
 
 
 def user_present(name, cloud_name, password_reset=False, **kwargs):
@@ -232,6 +274,23 @@ def user_present(name, cloud_name, password_reset=False, **kwargs):
         return _find_failed(name, 'user')
 
 
+def user_absent(name, cloud_name):
+    try:
+        _keystonev3_call('user_get_details', user_id=name,
+                         cloud_name=cloud_name)
+    except Exception as e:
+        if 'ResourceNotFound' in repr(e):
+            return _absent(name, 'user')
+        else:
+            log.error('Failed to get user {}'.format(e))
+            return _find_failed(name, 'user')
+    try:
+        _keystonev3_call('user_delete', user_id=name, cloud_name=cloud_name)
+    except Exception:
+        return _delete_failed(name, 'user')
+    return _deleted(name, 'user')
+
+
 def user_role_assigned(name, role_id, cloud_name, project_id=None,
                        domain_id=None, role_domain_id=None, **kwargs):
 
@@ -244,21 +303,30 @@ def user_role_assigned(name, role_id, cloud_name, project_id=None,
                  'project_get_details', project_id,
                  cloud_name=cloud_name)['project']['id']
 
-# TODO: Add when domain support is added.
-#    if domain_id and not uuidutils.is_uuid_like(domain_id):
-#        domain_id  = _keystonev3_call(
-#                 'domain_get_details', domain_id,
-#                 cloud_name=cloud_name)['domain']['id']
+    if domain_id:
+        domain_id  = _keystonev3_call(
+            'domain_get_details', domain_id,
+            cloud_name=cloud_name)['domain']['id']
 
-#    if role_domain_id and not uuidutils.is_uuid_like(role_domain_id):
-#        role_domain_id  = _keystonev3_call(
-#                 'domain_get_details', role_domain_id,
-#                 cloud_name=cloud_name)['domain']['id']
+
+    if (project_id and domain_id) or (not project_id and not domain_id):
+        return {
+            'name': name,
+            'changes': {},
+            'result': False,
+            'comment': 'Use project_id or domain_id (only one of them)'
+        }
+
+
+    if role_domain_id:
+        role_domain_id  = _keystonev3_call(
+            'domain_get_details', role_domain_id,
+            cloud_name=cloud_name)['domain']['id']
 
     if role_id:
         role_id = _keystonev3_call(
-                 'role_get_details', role_id, domain_id=role_domain_id,
-                 cloud_name=cloud_name)['role']['id']
+            'role_get_details', role_id, domain_id=role_domain_id,
+            cloud_name=cloud_name)['role']['id']
 
     req_kwargs = {'role.id': role_id, 'user.id': user_id,
                   'cloud_name': cloud_name}
@@ -278,8 +346,10 @@ def user_role_assigned(name, role_id, cloud_name, project_id=None,
         req_kwargs['project_id'] = project_id
 
     if not role_assignments:
+        method_type = 'project' if project_id else 'domain'
+        method = 'role_assign_for_user_on_{}'.format(method_type)
         try:
-            resp = _keystonev3_call('role_add', **req_kwargs)
+            resp = _keystonev3_call(method, **req_kwargs)
         except Exception as e:
             log.error('Keystone user role assignment with {}'.format(e))
             return _create_failed(name, 'user_role_assignment')
@@ -287,6 +357,69 @@ def user_role_assigned(name, role_id, cloud_name, project_id=None,
         # on this stage we already just assigned role if it was missed.
         return _created(name, 'user_role_assignment', resp)
     return _no_changes(name, 'user_role_assignment')
+
+
+def user_role_unassign(name, role_id, cloud_name, project_id=None,
+                       domain_id=None, role_domain_id=None):
+    user_id = _keystonev3_call(
+        'user_get_details', name,
+        cloud_name=cloud_name)['user']['id']
+
+    if project_id:
+        project_id = _keystonev3_call(
+            'project_get_details', project_id,
+            cloud_name=cloud_name)['project']['id']
+
+    if domain_id:
+        domain_id = _keystonev3_call(
+            'domain_get_details', domain_id,
+            cloud_name=cloud_name)['domain']['id']
+
+    if (project_id and domain_id) or (not project_id and not domain_id):
+        return {
+            'name': name,
+            'changes': {},
+            'result': False,
+            'comment': 'Use project_id or domain_id (only one of them)'
+        }
+
+    if role_domain_id:
+        role_domain_id = _keystonev3_call(
+            'domain_get_details', role_domain_id,
+            cloud_name=cloud_name)['domain']['id']
+
+    if role_id:
+        role_id = _keystonev3_call(
+            'role_get_details', role_id, domain_id=role_domain_id,
+            cloud_name=cloud_name)['role']['id']
+
+    req_kwargs = {'role.id': role_id, 'user.id': user_id,
+                  'cloud_name': cloud_name}
+    if domain_id:
+        req_kwargs['domain_id'] = domain_id
+    if project_id:
+        req_kwargs['project_id'] = project_id
+
+    role_assignments = _keystonev3_call(
+        'role_assignment_list', **req_kwargs)['role_assignments']
+
+    req_kwargs = {'cloud_name': cloud_name, 'user_id': user_id,
+                  'role_id': role_id}
+    if domain_id:
+        req_kwargs['domain_id'] = domain_id
+    if project_id:
+        req_kwargs['project_id'] = project_id
+
+    if not role_assignments:
+        return _absent(name, 'user_role_assignment')
+    else:
+        method_type = 'project' if project_id else 'domain'
+        method = 'role_unassign_for_user_on_{}'.format(method_type)
+        try:
+            _keystonev3_call(method, **req_kwargs)
+        except Exception:
+            return _delete_failed(name, 'user_role_assignment')
+    return _deleted(name, 'user_role_assignment')
 
 
 def role_present(name, cloud_name, **kwargs):
@@ -334,6 +467,23 @@ def role_present(name, cloud_name, **kwargs):
             return _no_changes(name, 'role')
     else:
         return _find_failed(name, 'role')
+
+
+def role_absent(name, cloud_name):
+    try:
+        _keystonev3_call('role_get_details', role_id=name,
+                         cloud_name=cloud_name)
+    except Exception as e:
+        if 'ResourceNotFound' in repr(e):
+            return _absent(name, 'role')
+        else:
+            log.error('Failed to get role {}'.format(e))
+            return _find_failed(name, 'role')
+    try:
+        _keystonev3_call('role_delete', role_id=name, cloud_name=cloud_name)
+    except Exception:
+        return _delete_failed(name, 'role')
+    return _deleted(name, 'role')
 
 
 def _created(name, resource, resource_definition):

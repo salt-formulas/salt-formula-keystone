@@ -1,4 +1,5 @@
-from keystonev3.common import get_by_name_or_uuid, send
+from keystonev3.common import send
+from keystonev3.arg_converter import get_by_name_or_uuid_multiple
 
 try:
     from urllib.parse import urlencode
@@ -6,20 +7,14 @@ except ImportError:
     from urllib import urlencode
 
 
-@send('get')
-def service_list(**kwargs):
-    url = '/services?{}'.format(urlencode(kwargs))
-    return url, None
-
-
-@get_by_name_or_uuid(service_list, 'services', 'service_id')
+@get_by_name_or_uuid_multiple([('service', 'service_id')])
 @send('get')
 def service_get_details(service_id, **kwargs):
     url = '/services/{}?{}'.format(service_id, urlencode(kwargs))
     return url, None
 
 
-@get_by_name_or_uuid(service_list, 'services', 'service_id')
+@get_by_name_or_uuid_multiple([('service', 'service_id')])
 @send('patch')
 def service_update(service_id, **kwargs):
     url = '/services/{}'.format(service_id)
@@ -29,7 +24,7 @@ def service_update(service_id, **kwargs):
     return url, json
 
 
-@get_by_name_or_uuid(service_list, 'services', 'service_id')
+@get_by_name_or_uuid_multiple([('service', 'service_id')])
 @send('delete')
 def service_delete(service_id, **kwargs):
     url = '/services/{}'.format(service_id)

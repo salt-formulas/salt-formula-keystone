@@ -1,5 +1,5 @@
 from keystonev3.common import send
-
+from keystonev3.arg_converter import get_by_name_or_uuid_multiple
 try:
     from urllib.parse import urlencode
 except ImportError:
@@ -27,16 +27,16 @@ def endpoint_delete(endpoint_id, **kwargs):
     return url, None
 
 
-@send('get')
-def endpoint_list(**kwargs):
-    url = '/endpoints?{}'.format(urlencode(kwargs))
-    return url, None
-
-
+@get_by_name_or_uuid_multiple([('service', 'service_id')])
 @send('post')
-def endpoint_create(**kwargs):
-    url = '/endpoints'
+def endpoint_create(service_id, url, interface, **kwargs):
+    api_url = '/endpoints'
     json = {
-        'endpoint': kwargs,
+        'endpoint': {
+            'service_id': service_id,
+            'url': url,
+            'interface': interface,
+        }
     }
-    return url, json
+    json['endpoint'].update(kwargs)
+    return api_url, json
