@@ -94,6 +94,8 @@ keystone_group:
   file.managed:
   - source: salt://keystone/files/{{ server.version }}/keystone.conf.{{ grains.os_family }}
   - template: jinja
+  - mode: 0640
+  - group: keystone
   - require:
     - pkg: keystone_packages
   - watch_in:
@@ -104,6 +106,8 @@ keystone_group:
 /etc/keystone/sso_callback_template.html:
   file.managed:
   - source: salt://keystone/files/sso_callback_template.html
+  - mode: 0640
+  - group: keystone
   - require:
     - pkg: keystone_packages
   - watch_in:
@@ -114,7 +118,8 @@ keystone_group:
 /etc/keystone/keystone-paste.ini:
   file.managed:
   - source: salt://keystone/files/{{ server.version }}/keystone-paste.ini.{{ grains.os_family }}
-  - user: keystone
+  - mode: 0640
+  - user: root
   - group: keystone
   - template: jinja
   - require:
@@ -132,7 +137,8 @@ keystone_fluentd_logger_package:
 
 /etc/keystone/logging.conf:
   file.managed:
-    - user: keystone
+    - mode: 0640
+    - user: root
     - group: keystone
     - source: salt://oslo_templates/files/logging/_logging.conf
     - template: jinja
@@ -158,7 +164,8 @@ keystone_fluentd_logger_package:
 
 /etc/keystone/policy.json:
   file.managed:
-  - user: keystone
+  - mode: 0640
+  - user: root
   - group: keystone
   - require:
     - pkg: keystone_packages
@@ -208,6 +215,8 @@ keystone_rule_{{ name }}_absent:
   file.managed:
     - source: salt://keystone/files/keystone.domain.conf
     - template: jinja
+    - mode: 0640
+    - group: keystone
     - require:
       - file: /etc/keystone/domains
     - watch_in:
@@ -298,6 +307,9 @@ keystone_entrypoint:
   file.managed:
   - source: salt://keystone/files/keystonerc
   - template: jinja
+  - mode: 0640
+  - user: root
+  - group: root
   - require:
     - pkg: keystone_packages
 
@@ -305,6 +317,9 @@ keystone_entrypoint:
   file.managed:
   - source: salt://keystone/files/keystonercv3
   - template: jinja
+  - mode: 0640
+  - user: root
+  - group: root
   - require:
     - pkg: keystone_packages
 

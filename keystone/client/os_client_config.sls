@@ -12,7 +12,7 @@ keystone_os_client_config_{{ conf_name }}:
     - name: {{ config.get('file', '/root/.config/openstack/clouds.yml') }}
     - contents: |
         {{ client.os_client_config.cfgs.get(conf_name).content |yaml(False)|indent(8) }}
-    - owner: {{ config.get('owner', 'root') }}
+    - user: {{ config.get('user', 'root') }}
     - group: {{ config.get('group', 'root') }}
     - makedirs: True
 
