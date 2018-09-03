@@ -145,6 +145,8 @@ keystone_fluentd_logger_package:
     - defaults:
         service_name: keystone
         _data: {{ server.logging }}
+    - require_in:
+      - sls: keystone.db.offline_sync
     - require:
       - pkg: keystone_packages
 {%- if server.logging.log_handlers.get('fluentd', {}).get('enabled', False) %}
