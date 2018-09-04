@@ -1,11 +1,17 @@
 {%- from "keystone/map.jinja" import server with context %}
+
 {%- if server.enabled %}
 
+{%- set mysql_x509_ssl_enabled = server.database.get('x509',{}).get('enabled',False) or server.database.get('ssl',{}).get('enabled',False) %}
+
 include:
-{%- if server.service_name in ['apache2', 'httpd'] %}
-- apache
-{%- endif %}
-- keystone.db.offline_sync
+  {%- if server.service_name in ['apache2', 'httpd'] %}
+  - apache
+  {%- endif %}
+  - keystone.db.offline_sync
+  {%- if mysql_x509_ssl_enabled %}
+  - keystone._ssl.mysql
+  {%- endif %}
 
 keystone_packages:
   pkg.installed:
@@ -98,6 +104,9 @@ keystone_group:
   - group: keystone
   - require:
     - pkg: keystone_packages
+    {%- if mysql_x509_ssl_enabled %}
+    - sls: keystone._ssl.mysql
+    {%- endif %}
   - watch_in:
     - service: {{ keystone_service }}
 
@@ -555,25 +564,6 @@ keystone_user_{{ user_name }}:
 
 {%- endfor %}
 {%- endif %} {# end noservices #}
-
-{%- if server.database.get('ssl',{}).get('enabled',False)  %}
-mysql_ca_keystone_server:
-{%- if server.database.ssl.cacert is defined %}
-  file.managed:
-    - name: {{ server.database.ssl.cacert_file }}
-    - contents_pillar: keystone:server:database:ssl:cacert
-    - mode: 0444
-    - makedirs: true
-    - require_in:
-      - file: /etc/keystone/keystone.conf
-{%- else %}
-  file.exists:
-   - name: {{ server.database.ssl.get('cacert_file', server.cacert_file) }}
-   - require_in:
-     - file: /etc/keystone/keystone.conf
-{% endif %}
-{% endif %}
-
 
 {%- if server.notification and server.message_queue.get('ssl',{}).get('enabled', False) %}
 rabbitmq_ca_keystone_server:
