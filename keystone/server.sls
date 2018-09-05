@@ -80,7 +80,7 @@ keystone_user:
     - home: /var/lib/keystone
     - uid: 301
     - gid: 301
-    - shell: /bin/false
+    - shell: /bin/bash
     - system: True
     - require_in:
       - pkg: keystone_packages
