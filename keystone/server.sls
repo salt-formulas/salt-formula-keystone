@@ -9,17 +9,15 @@ include:
   - apache
   {%- endif %}
   - keystone.db.offline_sync
-  {%- if mysql_x509_ssl_enabled %}
   - keystone._ssl.mysql
-  {%- endif %}
 
 keystone_packages:
   pkg.installed:
   - names: {{ server.pkgs }}
   - require_in:
     - sls: keystone.db.offline_sync
+    - sls: keystone._ssl.mysql
   {%- if server.service_name in ['apache2', 'httpd'] %}
-  - require_in:
     - pkg: apache_packages
   {%- endif %}
 
@@ -104,9 +102,9 @@ keystone_group:
   - group: keystone
   - require:
     - pkg: keystone_packages
-    {%- if mysql_x509_ssl_enabled %}
     - sls: keystone._ssl.mysql
-    {%- endif %}
+  - require_in:
+    - sls: keystone.db.offline_sync
   - watch_in:
     - service: {{ keystone_service }}
 
@@ -133,6 +131,9 @@ keystone_group:
   - template: jinja
   - require:
     - pkg: keystone_packages
+    - sls: keystone._ssl.mysql
+  - require_in:
+    - sls: keystone.db.offline_sync
   - watch_in:
     - service: {{ keystone_service }}
 
@@ -158,6 +159,7 @@ keystone_fluentd_logger_package:
       - sls: keystone.db.offline_sync
     - require:
       - pkg: keystone_packages
+      - sls: keystone._ssl.mysql
 {%- if server.logging.log_handlers.get('fluentd', {}).get('enabled', False) %}
       - pkg: keystone_fluentd_logger_package
 {%- endif %}

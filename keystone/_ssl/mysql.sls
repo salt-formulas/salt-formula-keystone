@@ -1,5 +1,9 @@
 {%- from "keystone/map.jinja" import server with context %}
 
+keystone_ssl_mysql:
+  test.show_notification:
+    - text: "Running keystone._ssl.mysql"
+
 {%- if server.database.get('x509',{}).get('enabled',False) %}
 
   {%- set ca_file=server.database.x509.ca_file %}
