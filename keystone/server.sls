@@ -2,8 +2,6 @@
 
 {%- if server.enabled %}
 
-{%- set mysql_x509_ssl_enabled = server.database.get('x509',{}).get('enabled',False) or server.database.get('ssl',{}).get('enabled',False) %}
-
 include:
   {%- if server.service_name in ['apache2', 'httpd'] %}
   - apache
