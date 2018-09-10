@@ -19,4 +19,8 @@ keystone_delete_os_client_config:
   module.run:
     - name: mine.delete
     - m_fun: keystone_os_client_config
+{%- else %}
+keystone_os_client_config_absent:
+  file.absent:
+    - name: /etc/openstack/clouds.yml
 {%- endif %}

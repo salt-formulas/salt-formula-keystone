@@ -4,9 +4,6 @@ keystone_pre:
   test.show_notification:
     - text: "Running keystone.upgrade.pre"
 
-include:
- - keystone.upgrade.verify.api
-
 {%- if server.enabled %}
 
 keystone_doctor:
@@ -26,4 +23,15 @@ keystone_send_os_client_config:
         mine_function: pillar.get
     - args:
       - 'keystone:client:os_client_config:cfgs:root:content'
+{%- else %}
+  {%- set os_content = salt['mine.get']('I@keystone:client:os_client_config:enabled:true', 'keystone_os_client_config', 'compound').values()[0] %}
+keystone_os_client_config:
+  file.managed:
+    - name: /etc/openstack/clouds.yml
+    - contents: |
+        {{ os_content |yaml(False)|indent(8) }}
+    - user: 'root'
+    - group: 'root'
+    - makedirs: True
+    - unless: /etc/openstack/clouds.yml
 {%- endif %}
