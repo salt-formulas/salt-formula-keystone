@@ -82,7 +82,7 @@ def rule_absent(name, path, **kwargs):
         if __opts__.get('test'):
             ret['result'] = None
             ret['comment'] = 'Rule {0} will be deleted'.format(name)
-        else
+        else:
             __salt__['keystone_policy.rule_delete'](name, path, **kwargs)
             ret['comment'] = 'Rule {0} has been deleted'.format(name)
             ret['changes']['Rule'] = 'Rule %s: "%s" has been deleted' % (name, rule_check[name])
