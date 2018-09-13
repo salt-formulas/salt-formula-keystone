@@ -501,7 +501,7 @@ keystone_{{ service_name }}_service:
 keystone_{{ service_name }}_{{ service.get('region', 'RegionOne') }}_endpoint:
   keystoneng.endpoint_present:
   - name: {{ service.get('service', service_name) }}
-  - publicurl: '{{ service.bind.get('public_protocol', 'http') }}://{{ service.bind.public_address }}:{{ service.bind.public_port }}{{ service.bind.public_path }}'
+  - publicurl: '{{ service.bind.get('public_protocol', 'http') }}://{{ service.bind.public_address }}{% if not service.bind.public_port|int == 80 %}:{{ service.bind.public_port }}{% endif %}{{ service.bind.public_path }}'
   - internalurl: '{{ service.bind.get('internal_protocol', 'http') }}://{{ service.bind.internal_address }}:{{ service.bind.internal_port }}{{ service.bind.internal_path }}'
   - adminurl: '{{ service.bind.get('admin_protocol', 'http') }}://{{ service.bind.admin_address }}:{{ service.bind.admin_port }}{{ service.bind.admin_path }}'
   - region: {{ service.get('region', 'RegionOne') }}
