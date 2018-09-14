@@ -8,13 +8,14 @@ include:
   {%- endif %}
   - keystone.db.offline_sync
   - keystone._ssl.mysql
-
+  - keystone._ssl.rabbitmq
 keystone_packages:
   pkg.installed:
   - names: {{ server.pkgs }}
   - require_in:
     - sls: keystone.db.offline_sync
     - sls: keystone._ssl.mysql
+    - sls: keystone._ssl.rabbitmq
   {%- if server.service_name in ['apache2', 'httpd'] %}
     - pkg: apache_packages
   {%- endif %}
@@ -101,6 +102,7 @@ keystone_group:
   - require:
     - pkg: keystone_packages
     - sls: keystone._ssl.mysql
+    - sls: keystone._ssl.rabbitmq
   - require_in:
     - sls: keystone.db.offline_sync
   - watch_in:
@@ -130,6 +132,7 @@ keystone_group:
   - require:
     - pkg: keystone_packages
     - sls: keystone._ssl.mysql
+    - sls: keystone._ssl.rabbitmq
   - require_in:
     - sls: keystone.db.offline_sync
   - watch_in:
@@ -158,6 +161,7 @@ keystone_fluentd_logger_package:
     - require:
       - pkg: keystone_packages
       - sls: keystone._ssl.mysql
+      - sls: keystone._ssl.rabbitmq
 {%- if server.logging.log_handlers.get('fluentd', {}).get('enabled', False) %}
       - pkg: keystone_fluentd_logger_package
 {%- endif %}
