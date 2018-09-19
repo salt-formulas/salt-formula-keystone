@@ -66,7 +66,7 @@ keystone_{{ server_name }}_service_{{ service_name }}:
 keystone_{{ server_name }}_service_{{ service_name }}_endpoint_{{ endpoint.region }}:
   keystoneng.endpoint_present:
   - name: {{ service_name }}
-  - publicurl: '{{ endpoint.get('public_protocol', 'http') }}://{{ endpoint.public_address }}{% if not (endpoint.get('public_protocol', 'http') == 'https' and endpoint.public_port|int == 443) %}:{{ endpoint.public_port }}{% endif %}{{ endpoint.public_path }}'
+  - publicurl: '{{ endpoint.get('public_protocol', 'http') }}://{{ endpoint.public_address }}{% if not ((endpoint.get('public_protocol') == 'https' and endpoint.public_port|int == 443) or (endpoint.get('public_protocol') == 'http' and endpoint.public_port|int == 80)) %}:{{ endpoint.public_port }}{% endif %}{{ endpoint.public_path }}'
   - internalurl: '{{ endpoint.get('internal_protocol', 'http') }}://{{ endpoint.internal_address }}{% if not (endpoint.get('internal_protocol', 'http') == 'https' and endpoint.internal_port|int == 443) %}:{{ endpoint.internal_port }}{% endif %}{{ endpoint.internal_path }}'
   - adminurl: '{{ endpoint.get('admin_protocol', 'http') }}://{{ endpoint.admin_address }}{% if not (endpoint.get('admin_protocol', 'http') == 'https' and endpoint.admin_port|int == 443) %}:{{ endpoint.admin_port }}{% endif %}{{ endpoint.admin_path }}'
   - region: {{ endpoint.region }}
