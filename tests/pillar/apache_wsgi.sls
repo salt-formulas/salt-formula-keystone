@@ -11,6 +11,7 @@ keystone:
     admin_name: admin
     admin_password: passw0rd
     admin_email: root@localhost
+    enable_proxy_headers_parsing: True
     bind:
       address: 0.0.0.0
       private_address: 127.0.0.1

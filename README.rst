@@ -41,6 +41,7 @@ Full stacked Keystone:
         admin_name: admin
         admin_password: 'adminpwd'
         admin_email: stackmaster@domain.com
+        enable_proxy_headers_parsing: True
         roles:
           - admin
           - Member
