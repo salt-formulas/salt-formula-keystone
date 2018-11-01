@@ -1,5 +1,5 @@
 {%- from "keystone/map.jinja" import client with context %}
-{%- if client.enabled and client.get('os_client_config', {}).get('enabled', False)  %}
+{%- if client.get('os_client_config', {}).get('enabled', False)  %}
 
 keystone_os_client_config_packages:
   pkg.installed:
