@@ -30,13 +30,13 @@ minion:
     {%- for profile_name, identity in client.get('server', {}).items() %}
       {%- set protocol = identity.admin.get('protocol', 'http') %}
 
-      {%- if identity.admin.get('api_version', '2') == 3 %}
+      {%- if identity.admin.get('api_version', '2')|string == '3' %}
         {%- set version = "/v3" %}
       {%- endif %}
-      {%- if identity.admin.get('api_version', '2') == 2 %}
+      {%- if identity.admin.get('api_version', '2')|string == '2' %}
         {%- set version = "/v2.0" %}
       {%- endif %}
-      {%- if identity.admin.get('api_version', '2') == '' %}
+      {%- if identity.admin.get('api_version', '2')|string == '' %}
         {%- set version = "" %}
       {%- endif %}
 
