@@ -346,6 +346,7 @@ keystone_fernet_keys:
   - mode: 750
   - user: keystone
   - group: keystone
+  - makedirs: true
   - require:
     - pkg: keystone_packages
   - require_in:
@@ -443,7 +444,7 @@ keystone_identity_bootstrap_setup:
 
 {%- if not grains.get('noservices', False) %}
 
-{%- if not salt['pillar.get']('linux:system:repo:mirantis_openstack', False) %}
+{%- if server.version < 'queens' and not salt['pillar.get']('linux:system:repo:mirantis_openstack', False) %}
 
 keystone_service_tenant:
   keystoneng.tenant_present:
