@@ -431,7 +431,7 @@ def role_present(name, cloud_name, **kwargs):
     if 'domain_id' in kwargs:
         kwargs['domain_id'] = _keystonev3_call(
             'domain_get_details', kwargs['domain_id'],
-            cloud_name=cloud_name)['domains']
+            cloud_name=cloud_name)['domain']
 
     if not roles:
         try:
